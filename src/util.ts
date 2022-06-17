@@ -3,7 +3,7 @@ export class Card {
     value: number;
 
     constructor() {
-
+        
     }
 
     constructor(suit: string, value: number) {
@@ -38,10 +38,18 @@ enum CardTypes {
 }
 
 export class Deck {
-    deck: Array;
+    deck: Array<Card>;
 
-    constructor() {
+    constructor(decks: number) {
         this.deck = []
+        for (let i = 1; i < 14; i++) {
+            this.deck.push(new Card(Suits.CLUBS), i)
+            this.deck.push(new Card(Suits.HEARTS), i)
+            this.deck.push(new Card(Suits.DIAMONDS), i)
+            this.deck.push(new Card(Suits.SPADES), i)
+        }
+        this.deck.push(new Card(Suits.JOKER, 0))
+        this.deck.push(new Card(Suits.JOKER, 0))
     }
 
     constructor(deck: Array) {
