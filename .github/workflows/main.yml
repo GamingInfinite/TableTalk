@@ -18,10 +18,10 @@ jobs:
           cache-dependency-path: 'yarn.lock'
       - run: yarn install
       - run: yarn build
-      - name: Committing changes
-        uses: EndBug/add-and-commit@v9
+      - name: Commit & Push changes
+        uses: actions-js/push@master
         with:
           author_name: Snowpack Build
           author_email: actions@github.com
           message: "Snowpack Commit"
-          push: origin webpage --set-upstream --force
+          branch: "webpage"
