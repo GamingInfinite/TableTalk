@@ -1,7 +1,7 @@
 name: Snowpack
 on:
   push:
-    branches: [ webpage ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   # Allows you to run this workflow manually from the Actions tab
@@ -23,3 +23,5 @@ jobs:
         with:
           author_name: Snowpack Build
           author_email: actions@github.com
+          message: "Snowpack Commit"
+          push: origin webpage
