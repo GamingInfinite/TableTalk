@@ -24,4 +24,4 @@ jobs:
           author_name: Snowpack Build
           author_email: actions@github.com
           message: "Snowpack Commit"
-          new_branch: webpage
+          push: origin webpage --set-upstream --force
