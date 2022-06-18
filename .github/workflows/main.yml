@@ -21,6 +21,7 @@ jobs:
       - name: Commit & Push changes
         uses: actions-js/push@master
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           author_name: Snowpack Build
           author_email: actions@github.com
           message: "Snowpack Commit"
