@@ -1,6 +1,6 @@
 <script lang="ts">
   import TitleScreen from "./Components/Menus/TitleScreen.svelte";
-  import { UserDisplayName } from "./stores";
+  import { UserDisplayName, SettingsModal } from "./stores";
 
   import { initializeApp } from "firebase/app";
   import {
@@ -56,7 +56,6 @@
   let playerRef: DatabaseReference;
 
   auth.onAuthStateChanged((user) => {
-    console.log(user);
     if (user) {
       player = user;
       playerID = user.uid;
@@ -67,10 +66,13 @@
         });
         playerAnonStatus = true;
       } else {
-        get(child(playerRef, "name")).then((snapshot) => {
-          set(playerRef, {
-            name: user.displayName,
-          });
+        get(child(ref(database, "players/"), playerID)).then((snapshot) => {
+          if (!snapshot.child("name").exists()) {
+            set(playerRef, {
+              name: user.displayName,
+            });
+            UserDisplayName.set(user.displayName);
+          }
         });
 
         playerAnonStatus = false;
@@ -81,7 +83,9 @@
       }
 
       get(child(playerRef, "name")).then((snapshot) => {
-        UserDisplayName.set(snapshot.val());
+        if (!(snapshot.val() == null)) {
+          UserDisplayName.set(snapshot.val());
+        }
       });
     }
   });
@@ -96,10 +100,22 @@
   let signInBtn: HTMLButtonElement;
 
   let showSignInModal: boolean = false;
+  let showSettingsModal: boolean = false;
+
+  let nameInput;
 
   function toggleSignInModal() {
     showSignInModal = !showSignInModal;
   }
+
+  function toggleSettingsModal() {
+    showSettingsModal = !showSettingsModal;
+    SettingsModal.set(showSettingsModal);
+  }
+
+  SettingsModal.subscribe((value) => {
+    showSettingsModal = value;
+  });
 
   const toggleAccDrop = () => {
     accState: {
@@ -113,6 +129,14 @@
         accDropShow = true;
         createPopper(stubRef, accDropRef, {
           placement: "bottom-start",
+          modifiers: [
+            {
+              name: "offset",
+              options: {
+                offset: [20, 20],
+              },
+            },
+          ],
         });
       }
     }
@@ -160,6 +184,13 @@
     toggleSignInModal();
   };
 
+  function changeName(name: string) {
+    set(playerRef, {
+      name: name,
+    });
+    UserDisplayName.set(name);
+  }
+
   var username: string = "";
   UserDisplayName.subscribe((value) => {
     username = value;
@@ -186,12 +217,12 @@
   </div>
   <svelte:component this={Menus[currentMenu]} />
   {#if showSignInModal}
-    <div class="signInModalWrapper">
-      <div class="signInModalHeader">
+    <div class="modalWrapper">
+      <div class="modalHeader">
         Sign In
         <span aria-hidden="true" on:click={toggleSignInModal}>&times;</span>
       </div>
-      <div class="signInModalContent">
+      <div class="modalContent">
         <!-- svelte-ignore a11y-missing-attribute -->
         <btn class="oauthBtn" on:click={loginGoogle}>
           <img
@@ -207,8 +238,28 @@
             alt="Github sign-in"
             src="https://upload.wikimedia.org/wikipedia/commons/1/11/Cc-by_new_white.svg"
           />
-          Login With Google
+          Anonymous Login
         </btn>
+      </div>
+    </div>
+    <div class="preventative-div" />
+  {/if}
+  {#if showSettingsModal}
+    <div class="modalWrapper">
+      <div class="modalHeader">
+        Settings
+        <span aria-hidden="true" on:click={toggleSettingsModal}>&times;</span>
+      </div>
+      <div class="modalContent">
+        <label for="nickname">Display Name</label>
+        <input
+          type="text"
+          name="nickname"
+          placeholder={username}
+          class="nicknameInput"
+          bind:value={nameInput}
+        />
+        <button class="nameChangeBtn" on:click={() => changeName(nameInput)}>Change Name</button>
       </div>
     </div>
     <div class="preventative-div" />
@@ -235,6 +286,17 @@
     display: block;
   }
 
+  .nicknameInput {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-left: 0.5rem;
+    background-color: white;
+    border-radius: 20px;
+    font-size: small;
+    outline: none;
+    color: rgb(42, 63, 85);
+  }
+
   .signin {
     background-color: rgb(0, 23, 128);
     border: none;
@@ -246,7 +308,7 @@
     border-radius: 20px;
   }
 
-  .signInModalWrapper {
+  .modalWrapper {
     background-color: white;
     position: absolute;
     top: 5rem;
@@ -258,9 +320,25 @@
     z-index: 50;
   }
 
-  .signInModalHeader {
+  .modalHeader {
     border-bottom-style: solid;
     border-color: rgb(0, 0, 0);
+  }
+
+  .modalContent {
+    margin-top: 1rem;
+    font-size: large;
+  }
+
+  .nameChangeBtn {
+    background-color: black;
+    padding: 0.5rem;
+    color: white;
+    border: none;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    font-size: large;
+    border-radius: 20px;
   }
 
   .preventative-div {
