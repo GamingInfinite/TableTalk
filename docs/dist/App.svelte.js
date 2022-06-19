@@ -20,6 +20,7 @@ import {
 	run_all,
 	safe_not_equal,
 	set_data,
+	set_input_value,
 	space,
 	text,
 	transition_in,
@@ -27,7 +28,7 @@ import {
 } from "../snowpack/pkg/svelte/internal.js";
 
 import TitleScreen from "./Components/Menus/TitleScreen.svelte.js";
-import { UserDisplayName } from "./stores.js";
+import { UserDisplayName, SettingsModal } from "./stores.js";
 import { initializeApp } from "../snowpack/pkg/firebase/app.js";
 
 import {
@@ -53,29 +54,29 @@ function create_else_block(ctx) {
 		c() {
 			button = element("button");
 			button.textContent = "Sign In";
-			attr(button, "class", "signin svelte-t0921d");
+			attr(button, "class", "signin svelte-61gyc5");
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
-			/*button_binding*/ ctx[13](button);
+			/*button_binding*/ ctx[17](button);
 
 			if (!mounted) {
-				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[7]);
+				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[9]);
 				mounted = true;
 			}
 		},
 		p: noop,
 		d(detaching) {
 			if (detaching) detach(button);
-			/*button_binding*/ ctx[13](null);
+			/*button_binding*/ ctx[17](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (127:4) {#if username != ""}
-function create_if_block_1(ctx) {
+// (154:4) {#if username != ""}
+function create_if_block_2(ctx) {
 	let t0;
 	let t1;
 	let div;
@@ -86,31 +87,31 @@ function create_if_block_1(ctx) {
 
 	return {
 		c() {
-			t0 = text(/*username*/ ctx[5]);
+			t0 = text(/*username*/ ctx[7]);
 			t1 = space();
 			div = element("div");
 			a = element("a");
 			a.textContent = "Sign Out";
-			attr(a, "class", "dropdownbutton svelte-t0921d");
+			attr(a, "class", "dropdownbutton svelte-61gyc5");
 			attr(div, "id", "accDrop");
-			attr(div, "class", div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-t0921d"));
+			attr(div, "class", div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-61gyc5"));
 		},
 		m(target, anchor) {
 			insert(target, t0, anchor);
 			insert(target, t1, anchor);
 			insert(target, div, anchor);
 			append(div, a);
-			/*div_binding*/ ctx[12](div);
+			/*div_binding*/ ctx[16](div);
 
 			if (!mounted) {
-				dispose = listen(a, "click", /*logout*/ ctx[9]);
+				dispose = listen(a, "click", /*logout*/ ctx[12]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*username*/ 32) set_data(t0, /*username*/ ctx[5]);
+			if (dirty[0] & /*username*/ 128) set_data(t0, /*username*/ ctx[7]);
 
-			if (dirty & /*accDropShow*/ 1 && div_class_value !== (div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-t0921d"))) {
+			if (dirty[0] & /*accDropShow*/ 1 && div_class_value !== (div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-61gyc5"))) {
 				attr(div, "class", div_class_value);
 			}
 		},
@@ -118,15 +119,15 @@ function create_if_block_1(ctx) {
 			if (detaching) detach(t0);
 			if (detaching) detach(t1);
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[12](null);
+			/*div_binding*/ ctx[16](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (144:2) {#if showSignInModal}
-function create_if_block(ctx) {
+// (171:2) {#if showSignInModal}
+function create_if_block_1(ctx) {
 	let div2;
 	let div0;
 	let t0;
@@ -152,24 +153,24 @@ function create_if_block(ctx) {
 			div1 = element("div");
 			btn0 = element("btn");
 
-			btn0.innerHTML = `<img class="oauth-icon svelte-t0921d" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>
+			btn0.innerHTML = `<img class="oauth-icon svelte-61gyc5" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>
           Login With Google`;
 
 			t4 = space();
 			btn1 = element("btn");
 
-			btn1.innerHTML = `<img class="oauth-icon svelte-t0921d" alt="Github sign-in" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Cc-by_new_white.svg"/>
-          Login With Google`;
+			btn1.innerHTML = `<img class="oauth-icon svelte-61gyc5" alt="Github sign-in" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Cc-by_new_white.svg"/>
+          Anonymous Login`;
 
 			t6 = space();
 			div3 = element("div");
 			attr(span, "aria-hidden", "true");
-			attr(div0, "class", "signInModalHeader svelte-t0921d");
-			attr(btn0, "class", "oauthBtn svelte-t0921d");
-			attr(btn1, "class", "oauthBtn svelte-t0921d");
-			attr(div1, "class", "signInModalContent");
-			attr(div2, "class", "signInModalWrapper svelte-t0921d");
-			attr(div3, "class", "preventative-div svelte-t0921d");
+			attr(div0, "class", "modalHeader svelte-61gyc5");
+			attr(btn0, "class", "oauthBtn svelte-61gyc5");
+			attr(btn1, "class", "oauthBtn svelte-61gyc5");
+			attr(div1, "class", "modalContent svelte-61gyc5");
+			attr(div2, "class", "modalWrapper svelte-61gyc5");
+			attr(div3, "class", "preventative-div svelte-61gyc5");
 		},
 		m(target, anchor) {
 			insert(target, div2, anchor);
@@ -186,9 +187,9 @@ function create_if_block(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "click", /*toggleSignInModal*/ ctx[7]),
-					listen(btn0, "click", /*loginGoogle*/ ctx[11]),
-					listen(btn1, "click", /*loginAnon*/ ctx[10])
+					listen(span, "click", /*toggleSignInModal*/ ctx[9]),
+					listen(btn0, "click", /*loginGoogle*/ ctx[14]),
+					listen(btn1, "click", /*loginAnon*/ ctx[13])
 				];
 
 				mounted = true;
@@ -205,24 +206,118 @@ function create_if_block(ctx) {
 	};
 }
 
+// (199:2) {#if showSettingsModal}
+function create_if_block(ctx) {
+	let div2;
+	let div0;
+	let t0;
+	let span;
+	let t2;
+	let div1;
+	let label;
+	let t4;
+	let input;
+	let t5;
+	let button;
+	let t7;
+	let div3;
+	let mounted;
+	let dispose;
+
+	return {
+		c() {
+			div2 = element("div");
+			div0 = element("div");
+			t0 = text("Settings\n        ");
+			span = element("span");
+			span.textContent = "×";
+			t2 = space();
+			div1 = element("div");
+			label = element("label");
+			label.textContent = "Display Name";
+			t4 = space();
+			input = element("input");
+			t5 = space();
+			button = element("button");
+			button.textContent = "Change Name";
+			t7 = space();
+			div3 = element("div");
+			attr(span, "aria-hidden", "true");
+			attr(div0, "class", "modalHeader svelte-61gyc5");
+			attr(label, "for", "nickname");
+			attr(input, "type", "text");
+			attr(input, "name", "nickname");
+			attr(input, "placeholder", /*username*/ ctx[7]);
+			attr(input, "class", "nicknameInput svelte-61gyc5");
+			attr(button, "class", "nameChangeBtn svelte-61gyc5");
+			attr(div1, "class", "modalContent svelte-61gyc5");
+			attr(div2, "class", "modalWrapper svelte-61gyc5");
+			attr(div3, "class", "preventative-div svelte-61gyc5");
+		},
+		m(target, anchor) {
+			insert(target, div2, anchor);
+			append(div2, div0);
+			append(div0, t0);
+			append(div0, span);
+			append(div2, t2);
+			append(div2, div1);
+			append(div1, label);
+			append(div1, t4);
+			append(div1, input);
+			set_input_value(input, /*nameInput*/ ctx[6]);
+			append(div1, t5);
+			append(div1, button);
+			insert(target, t7, anchor);
+			insert(target, div3, anchor);
+
+			if (!mounted) {
+				dispose = [
+					listen(span, "click", /*toggleSettingsModal*/ ctx[10]),
+					listen(input, "input", /*input_input_handler*/ ctx[19]),
+					listen(button, "click", /*click_handler*/ ctx[20])
+				];
+
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (dirty[0] & /*username*/ 128) {
+				attr(input, "placeholder", /*username*/ ctx[7]);
+			}
+
+			if (dirty[0] & /*nameInput*/ 64 && input.value !== /*nameInput*/ ctx[6]) {
+				set_input_value(input, /*nameInput*/ ctx[6]);
+			}
+		},
+		d(detaching) {
+			if (detaching) detach(div2);
+			if (detaching) detach(t7);
+			if (detaching) detach(div3);
+			mounted = false;
+			run_all(dispose);
+		}
+	};
+}
+
 function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let t0;
 	let switch_instance;
 	let t1;
+	let t2;
 	let current;
 	let mounted;
 	let dispose;
 
 	function select_block_type(ctx, dirty) {
-		if (/*username*/ ctx[5] != "") return create_if_block_1;
+		if (/*username*/ ctx[7] != "") return create_if_block_2;
 		return create_else_block;
 	}
 
-	let current_block_type = select_block_type(ctx, -1);
+	let current_block_type = select_block_type(ctx, [-1, -1]);
 	let if_block0 = current_block_type(ctx);
-	var switch_value = /*Menus*/ ctx[6][currentMenu];
+	var switch_value = /*Menus*/ ctx[8][currentMenu];
 
 	function switch_props(ctx) {
 		return {};
@@ -232,7 +327,8 @@ function create_fragment(ctx) {
 		switch_instance = new switch_value(switch_props(ctx));
 	}
 
-	let if_block1 = /*showSignInModal*/ ctx[4] && create_if_block(ctx);
+	let if_block1 = /*showSignInModal*/ ctx[4] && create_if_block_1(ctx);
+	let if_block2 = /*showSettingsModal*/ ctx[5] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -243,15 +339,17 @@ function create_fragment(ctx) {
 			if (switch_instance) create_component(switch_instance.$$.fragment);
 			t1 = space();
 			if (if_block1) if_block1.c();
+			t2 = space();
+			if (if_block2) if_block2.c();
 			attr(div0, "id", "userStub");
-			attr(div0, "class", "svelte-t0921d");
-			attr(div1, "class", "screen svelte-t0921d");
+			attr(div0, "class", "svelte-61gyc5");
+			attr(div1, "class", "screen svelte-61gyc5");
 		},
 		m(target, anchor) {
 			insert(target, div1, anchor);
 			append(div1, div0);
 			if_block0.m(div0, null);
-			/*div0_binding*/ ctx[14](div0);
+			/*div0_binding*/ ctx[18](div0);
 			append(div1, t0);
 
 			if (switch_instance) {
@@ -260,14 +358,16 @@ function create_fragment(ctx) {
 
 			append(div1, t1);
 			if (if_block1) if_block1.m(div1, null);
+			append(div1, t2);
+			if (if_block2) if_block2.m(div1, null);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div0, "click", /*toggleAccDrop*/ ctx[8]);
+				dispose = listen(div0, "click", /*toggleAccDrop*/ ctx[11]);
 				mounted = true;
 			}
 		},
-		p(ctx, [dirty]) {
+		p(ctx, dirty) {
 			if (current_block_type === (current_block_type = select_block_type(ctx, dirty)) && if_block0) {
 				if_block0.p(ctx, dirty);
 			} else {
@@ -280,7 +380,7 @@ function create_fragment(ctx) {
 				}
 			}
 
-			if (switch_value !== (switch_value = /*Menus*/ ctx[6][currentMenu])) {
+			if (switch_value !== (switch_value = /*Menus*/ ctx[8][currentMenu])) {
 				if (switch_instance) {
 					group_outros();
 					const old_component = switch_instance;
@@ -308,13 +408,26 @@ function create_fragment(ctx) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block(ctx);
+					if_block1 = create_if_block_1(ctx);
 					if_block1.c();
-					if_block1.m(div1, null);
+					if_block1.m(div1, t2);
 				}
 			} else if (if_block1) {
 				if_block1.d(1);
 				if_block1 = null;
+			}
+
+			if (/*showSettingsModal*/ ctx[5]) {
+				if (if_block2) {
+					if_block2.p(ctx, dirty);
+				} else {
+					if_block2 = create_if_block(ctx);
+					if_block2.c();
+					if_block2.m(div1, null);
+				}
+			} else if (if_block2) {
+				if_block2.d(1);
+				if_block2 = null;
 			}
 		},
 		i(local) {
@@ -329,9 +442,10 @@ function create_fragment(ctx) {
 		d(detaching) {
 			if (detaching) detach(div1);
 			if_block0.d();
-			/*div0_binding*/ ctx[14](null);
+			/*div0_binding*/ ctx[18](null);
 			if (switch_instance) destroy_component(switch_instance);
 			if (if_block1) if_block1.d();
+			if (if_block2) if_block2.d();
 			mounted = false;
 			dispose();
 		}
@@ -363,8 +477,6 @@ function instance($$self, $$props, $$invalidate) {
 	let playerRef;
 
 	auth.onAuthStateChanged(user => {
-		console.log(user);
-
 		if (user) {
 			player = user;
 			playerID = user.uid;
@@ -374,8 +486,11 @@ function instance($$self, $$props, $$invalidate) {
 				set(playerRef, { name: "Anon" });
 				playerAnonStatus = true;
 			} else {
-				get(child(playerRef, "name")).then(snapshot => {
-					set(playerRef, { name: user.displayName });
+				get(child(ref(database, "players/"), playerID)).then(snapshot => {
+					if (!snapshot.child("name").exists()) {
+						set(playerRef, { name: user.displayName });
+						UserDisplayName.set(user.displayName);
+					}
 				});
 
 				playerAnonStatus = false;
@@ -386,7 +501,9 @@ function instance($$self, $$props, $$invalidate) {
 			}
 
 			get(child(playerRef, "name")).then(snapshot => {
-				UserDisplayName.set(snapshot.val());
+				if (!(snapshot.val() == null)) {
+					UserDisplayName.set(snapshot.val());
+				}
 			});
 		}
 	});
@@ -397,10 +514,21 @@ function instance($$self, $$props, $$invalidate) {
 	let accDropRef;
 	let signInBtn;
 	let showSignInModal = false;
+	let showSettingsModal = false;
+	let nameInput;
 
 	function toggleSignInModal() {
 		$$invalidate(4, showSignInModal = !showSignInModal);
 	}
+
+	function toggleSettingsModal() {
+		$$invalidate(5, showSettingsModal = !showSettingsModal);
+		SettingsModal.set(showSettingsModal);
+	}
+
+	SettingsModal.subscribe(value => {
+		$$invalidate(5, showSettingsModal = value);
+	});
 
 	const toggleAccDrop = () => {
 		accState: {
@@ -412,7 +540,16 @@ function instance($$self, $$props, $$invalidate) {
 				$$invalidate(0, accDropShow = false);
 			} else {
 				$$invalidate(0, accDropShow = true);
-				createPopper(stubRef, accDropRef, { placement: "bottom-start" });
+
+				createPopper(stubRef, accDropRef, {
+					placement: "bottom-start",
+					modifiers: [
+						{
+							name: "offset",
+							options: { offset: [20, 20] }
+						}
+					]
+				});
 			}
 		}
 	};
@@ -460,10 +597,15 @@ function instance($$self, $$props, $$invalidate) {
 		toggleSignInModal();
 	};
 
+	function changeName(name) {
+		set(playerRef, { name });
+		UserDisplayName.set(name);
+	}
+
 	var username = "";
 
 	UserDisplayName.subscribe(value => {
-		$$invalidate(5, username = value);
+		$$invalidate(7, username = value);
 	});
 
 	function div_binding($$value) {
@@ -487,29 +629,42 @@ function instance($$self, $$props, $$invalidate) {
 		});
 	}
 
+	function input_input_handler() {
+		nameInput = this.value;
+		$$invalidate(6, nameInput);
+	}
+
+	const click_handler = () => changeName(nameInput);
+
 	return [
 		accDropShow,
 		stubRef,
 		accDropRef,
 		signInBtn,
 		showSignInModal,
+		showSettingsModal,
+		nameInput,
 		username,
 		Menus,
 		toggleSignInModal,
+		toggleSettingsModal,
 		toggleAccDrop,
 		logout,
 		loginAnon,
 		loginGoogle,
+		changeName,
 		div_binding,
 		button_binding,
-		div0_binding
+		div0_binding,
+		input_input_handler,
+		click_handler
 	];
 }
 
 class App extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, {});
+		init(this, options, instance, create_fragment, safe_not_equal, {}, null, [-1, -1]);
 	}
 }
 

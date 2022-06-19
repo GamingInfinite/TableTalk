@@ -57,6 +57,9 @@ function set_data(text2, data) {
   if (text2.wholeText !== data)
     text2.data = data;
 }
+function set_input_value(input, value) {
+  input.value = value == null ? "" : value;
+}
 function custom_event(type, detail, {bubbles = false, cancelable = false} = {}) {
   const e = document.createEvent("CustomEvent");
   e.initCustomEvent(type, bubbles, cancelable, detail);
@@ -342,4 +345,4 @@ class SvelteComponentTyped extends SvelteComponentDev {
   }
 }
 
-export { null_to_empty as A, run_all as B, safe_not_equal as C, set_data as D, space as E, text as F, transition_in as G, transition_out as H, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, append as j, attr as k, binding_callbacks as l, check_outros as m, create_component as n, onDestroy as o, destroy_component as p, detach as q, element as r, setContext as s, tick as t, group_outros as u, init as v, insert as w, listen as x, mount_component as y, noop as z };
+export { null_to_empty as A, run_all as B, safe_not_equal as C, set_data as D, set_input_value as E, space as F, text as G, transition_in as H, transition_out as I, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, append as j, attr as k, binding_callbacks as l, check_outros as m, create_component as n, onDestroy as o, destroy_component as p, detach as q, element as r, setContext as s, tick as t, group_outros as u, init as v, insert as w, listen as x, mount_component as y, noop as z };
