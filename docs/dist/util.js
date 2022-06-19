@@ -51,9 +51,5 @@ export class Deck {
       this.deck.splice(randPick, 1);
     }
     this.deck = randDeck;
-    for (let i = 0; i < this.deck.length; i++) {
-      const element = this.deck[i];
-      console.log(element.suit, " ", element.value);
-    }
   }
 }
