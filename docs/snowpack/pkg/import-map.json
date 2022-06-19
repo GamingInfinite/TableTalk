@@ -1,5 +1,12 @@
 {
   "imports": {
-    "svelte/internal": "./svelte/internal.js"
+    "@popperjs/core": "./@popperjs/core.js",
+    "firebase/analytics": "./firebase/analytics.js",
+    "firebase/app": "./firebase/app.js",
+    "firebase/auth": "./firebase/auth.js",
+    "firebase/database": "./firebase/database.js",
+    "svelte": "./svelte.js",
+    "svelte/internal": "./svelte/internal.js",
+    "svelte/store": "./svelte/store.js"
   }
 }
