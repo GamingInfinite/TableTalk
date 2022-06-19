@@ -81,6 +81,12 @@
         this.cards.push(new Card(SUITS.JOKER, 0));
       }
     }
+
+    getTop(): Card {
+      var top = this.cards[0];
+      this.cards.shift();
+      return top;
+    }
   }
 
   class Hand extends Deck {
@@ -98,12 +104,6 @@
       this.player = player;
     }
 
-    getTop(): Card {
-      var top = this.cards[0];
-      this.cards.shift();
-      return top;
-    }
-
     addBottom(adds: Array<Card>): void {
       this.cards = this.cards.concat(adds);
     }
@@ -111,11 +111,25 @@
 
   class War {
     players: Hand[];
+    deck: Deck;
 
     constructor(players: Array<string>) {
+      this.deck = new Deck();
+      this.deck.fullDeck();
       this.players = [];
       for (let i = 0; i < players.length; i++) {
         this.players.push(new Hand(players[i], false));
+      }
+    }
+
+    deal(): void{
+      var p = 0;
+      while(this.deck.cards.length > 0){
+        this.players[p].addCards(1, false, this.deck.getTop());
+        p++;
+        if (p >= this.players.length){
+          p = 0;
+        }
       }
     }
   }
