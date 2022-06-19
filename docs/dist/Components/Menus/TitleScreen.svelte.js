@@ -11,13 +11,14 @@ import {
 	listen,
 	noop,
 	null_to_empty,
+	run_all,
 	safe_not_equal,
 	space,
 	text
 } from "../../../snowpack/pkg/svelte/internal.js";
 
 import { Deck } from "../../util.js";
-import { UserDisplayName, SettingsModal } from "../../stores.js";
+import { UserDisplayName, SettingsModal, Screen } from "../../stores.js";
 import "../../../snowpack/pkg/svelte.js";
 
 function create_fragment(ctx) {
@@ -28,10 +29,8 @@ function create_fragment(ctx) {
 	let t2;
 	let button0_class_value;
 	let t3;
-	let br;
-	let t4;
 	let button1;
-	let t5;
+	let t4;
 	let button1_class_value;
 	let mounted;
 	let dispose;
@@ -45,13 +44,11 @@ function create_fragment(ctx) {
 			button0 = element("button");
 			t2 = text("Play");
 			t3 = space();
-			br = element("br");
-			t4 = space();
 			button1 = element("button");
-			t5 = text("Settings");
-			attr(div0, "class", "title svelte-6jgmlm");
-			attr(button0, "class", button0_class_value = "" + (null_to_empty("playButton " + /*bandaid*/ ctx[0]) + " svelte-6jgmlm"));
-			attr(button1, "class", button1_class_value = "" + (null_to_empty("settings " + /*bandaid*/ ctx[0]) + " svelte-6jgmlm"));
+			t4 = text("Settings");
+			attr(div0, "class", "title svelte-1lsurz4");
+			attr(button0, "class", button0_class_value = "" + (null_to_empty("bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"));
+			attr(button1, "class", button1_class_value = "" + (null_to_empty("bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"));
 			attr(div1, "class", "buttons");
 		},
 		m(target, anchor) {
@@ -61,22 +58,24 @@ function create_fragment(ctx) {
 			append(div1, button0);
 			append(button0, t2);
 			append(div1, t3);
-			append(div1, br);
-			append(div1, t4);
 			append(div1, button1);
-			append(button1, t5);
+			append(button1, t4);
 
 			if (!mounted) {
-				dispose = listen(button1, "click", /*toggleSettings*/ ctx[1]);
+				dispose = [
+					listen(button0, "click", /*click_handler*/ ctx[2]),
+					listen(button1, "click", /*toggleSettings*/ ctx[1])
+				];
+
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*bandaid*/ 1 && button0_class_value !== (button0_class_value = "" + (null_to_empty("playButton " + /*bandaid*/ ctx[0]) + " svelte-6jgmlm"))) {
+			if (dirty & /*bandaid*/ 1 && button0_class_value !== (button0_class_value = "" + (null_to_empty("bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"))) {
 				attr(button0, "class", button0_class_value);
 			}
 
-			if (dirty & /*bandaid*/ 1 && button1_class_value !== (button1_class_value = "" + (null_to_empty("settings " + /*bandaid*/ ctx[0]) + " svelte-6jgmlm"))) {
+			if (dirty & /*bandaid*/ 1 && button1_class_value !== (button1_class_value = "" + (null_to_empty("bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"))) {
 				attr(button1, "class", button1_class_value);
 			}
 		},
@@ -87,7 +86,7 @@ function create_fragment(ctx) {
 			if (detaching) detach(t1);
 			if (detaching) detach(div1);
 			mounted = false;
-			dispose();
+			run_all(dispose);
 		}
 	};
 }
@@ -119,7 +118,12 @@ function instance($$self, $$props, $$invalidate) {
 
 	var testDeck = new Deck(true);
 	testDeck.shuffle();
-	return [bandaid, toggleSettings];
+
+	const click_handler = () => {
+		Screen.set(1);
+	};
+
+	return [bandaid, toggleSettings, click_handler];
 }
 
 class TitleScreen extends SvelteComponent {
