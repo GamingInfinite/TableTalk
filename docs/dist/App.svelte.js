@@ -16,7 +16,6 @@ import {
 	listen,
 	mount_component,
 	noop,
-	null_to_empty,
 	run_all,
 	safe_not_equal,
 	set_data,
@@ -28,7 +27,10 @@ import {
 } from "../snowpack/pkg/svelte/internal.js";
 
 import TitleScreen from "./Components/Menus/TitleScreen.svelte.js";
-import { UserDisplayName, SettingsModal } from "./stores.js";
+import LobbyList from "./Components/Menus/LobbyList.svelte.js";
+import { UserDisplayName, SettingsModal, Screen } from "./stores.js";
+import Fa from "../snowpack/pkg/svelte-fa.js";
+import { faTurnDown } from "../snowpack/pkg/@fortawesome/free-solid-svg-icons/index.es.js";
 import { initializeApp } from "../snowpack/pkg/firebase/app.js";
 
 import {
@@ -54,28 +56,28 @@ function create_else_block(ctx) {
 		c() {
 			button = element("button");
 			button.textContent = "Sign In";
-			attr(button, "class", "signin svelte-61gyc5");
+			attr(button, "class", "signin svelte-cs9num");
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
-			/*button_binding*/ ctx[17](button);
+			/*button_binding*/ ctx[18](button);
 
 			if (!mounted) {
-				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[9]);
+				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[10]);
 				mounted = true;
 			}
 		},
 		p: noop,
 		d(detaching) {
 			if (detaching) detach(button);
-			/*button_binding*/ ctx[17](null);
+			/*button_binding*/ ctx[18](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (154:4) {#if username != ""}
+// (152:4) {#if username != ""}
 function create_if_block_2(ctx) {
 	let t0;
 	let t1;
@@ -87,31 +89,31 @@ function create_if_block_2(ctx) {
 
 	return {
 		c() {
-			t0 = text(/*username*/ ctx[7]);
+			t0 = text(/*username*/ ctx[8]);
 			t1 = space();
 			div = element("div");
 			a = element("a");
 			a.textContent = "Sign Out";
-			attr(a, "class", "dropdownbutton svelte-61gyc5");
+			attr(a, "class", "text-sm py-2 px-4 font-normal block w-full whitespace-no-wrap bg-transparent text-white");
 			attr(div, "id", "accDrop");
-			attr(div, "class", div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-61gyc5"));
+			attr(div, "class", div_class_value = "bg-purple-500 text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1 min-w-48 " + (/*accDropShow*/ ctx[1] ? 'block' : 'hidden'));
 		},
 		m(target, anchor) {
 			insert(target, t0, anchor);
 			insert(target, t1, anchor);
 			insert(target, div, anchor);
 			append(div, a);
-			/*div_binding*/ ctx[16](div);
+			/*div_binding*/ ctx[17](div);
 
 			if (!mounted) {
-				dispose = listen(a, "click", /*logout*/ ctx[12]);
+				dispose = listen(a, "click", /*logout*/ ctx[13]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty[0] & /*username*/ 128) set_data(t0, /*username*/ ctx[7]);
+			if (dirty[0] & /*username*/ 256) set_data(t0, /*username*/ ctx[8]);
 
-			if (dirty[0] & /*accDropShow*/ 1 && div_class_value !== (div_class_value = "" + (null_to_empty(/*accDropShow*/ ctx[0] ? "block" : "hidden") + " svelte-61gyc5"))) {
+			if (dirty[0] & /*accDropShow*/ 2 && div_class_value !== (div_class_value = "bg-purple-500 text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1 min-w-48 " + (/*accDropShow*/ ctx[1] ? 'block' : 'hidden'))) {
 				attr(div, "class", div_class_value);
 			}
 		},
@@ -119,77 +121,81 @@ function create_if_block_2(ctx) {
 			if (detaching) detach(t0);
 			if (detaching) detach(t1);
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[16](null);
+			/*div_binding*/ ctx[17](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (171:2) {#if showSignInModal}
+// (176:2) {#if showSignInModal}
 function create_if_block_1(ctx) {
-	let div2;
+	let div5;
+	let div4;
 	let div0;
 	let t0;
-	let span;
+	let button0;
 	let t2;
-	let div1;
-	let btn0;
-	let t4;
-	let btn1;
-	let t6;
 	let div3;
+	let button1;
+	let t5;
+	let button2;
+	let t8;
+	let div6;
 	let mounted;
 	let dispose;
 
 	return {
 		c() {
-			div2 = element("div");
+			div5 = element("div");
+			div4 = element("div");
 			div0 = element("div");
-			t0 = text("Sign In\n        ");
-			span = element("span");
-			span.textContent = "×";
+			t0 = text("Sign In\n          ");
+			button0 = element("button");
+			button0.innerHTML = `<span aria-hidden="true">×</span>`;
 			t2 = space();
-			div1 = element("div");
-			btn0 = element("btn");
-
-			btn0.innerHTML = `<img class="oauth-icon svelte-61gyc5" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>
-          Login With Google`;
-
-			t4 = space();
-			btn1 = element("btn");
-
-			btn1.innerHTML = `<img class="oauth-icon svelte-61gyc5" alt="Github sign-in" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Cc-by_new_white.svg"/>
-          Anonymous Login`;
-
-			t6 = space();
 			div3 = element("div");
-			attr(span, "aria-hidden", "true");
-			attr(div0, "class", "modalHeader svelte-61gyc5");
-			attr(btn0, "class", "oauthBtn svelte-61gyc5");
-			attr(btn1, "class", "oauthBtn svelte-61gyc5");
-			attr(div1, "class", "modalContent svelte-61gyc5");
-			attr(div2, "class", "modalWrapper svelte-61gyc5");
-			attr(div3, "class", "preventative-div svelte-61gyc5");
+			button1 = element("button");
+
+			button1.innerHTML = `<img class="oauth-icon inline-flex w-24" alt="Google sign-in" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/> 
+            <div class="inline-flex">Login With Google</div>`;
+
+			t5 = space();
+			button2 = element("button");
+
+			button2.innerHTML = `<img class="oauth-icon inline-flex 2-24" alt="Anon sign-in" src="https://upload.wikimedia.org/wikipedia/commons/1/11/Cc-by_new_white.svg"/> 
+            <div class="inline-flex">Anonymous Login</div>`;
+
+			t8 = space();
+			div6 = element("div");
+			attr(button0, "class", "p-1 ml-auto bg-transparent border-0 text-black opacity-2 float-right text-3xl leading-none font-semibold outline-none focus:outline-none");
+			attr(div0, "class", "flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t text-4xl");
+			attr(button1, "class", "text-black font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 bg-slate-50 active:bg-slate-200 ease-linear transition-all duration-150");
+			attr(button2, "class", "text-black font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 bg-slate-50 active:bg-slate-200 ease-linear transition-all duration-150");
+			attr(div3, "class", "relative p-6 flex-auto");
+			attr(div4, "class", "relative w-auto my-6 mx-auto max-w-3xl bg-slate-50 rounded-md");
+			attr(div5, "class", "overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex");
+			attr(div6, "class", "opacity-25 fixed inset-0 z-40 bg-black");
 		},
 		m(target, anchor) {
-			insert(target, div2, anchor);
-			append(div2, div0);
+			insert(target, div5, anchor);
+			append(div5, div4);
+			append(div4, div0);
 			append(div0, t0);
-			append(div0, span);
-			append(div2, t2);
-			append(div2, div1);
-			append(div1, btn0);
-			append(div1, t4);
-			append(div1, btn1);
-			insert(target, t6, anchor);
-			insert(target, div3, anchor);
+			append(div0, button0);
+			append(div4, t2);
+			append(div4, div3);
+			append(div3, button1);
+			append(div3, t5);
+			append(div3, button2);
+			insert(target, t8, anchor);
+			insert(target, div6, anchor);
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "click", /*toggleSignInModal*/ ctx[9]),
-					listen(btn0, "click", /*loginGoogle*/ ctx[14]),
-					listen(btn1, "click", /*loginAnon*/ ctx[13])
+					listen(button0, "click", /*toggleSignInModal*/ ctx[10]),
+					listen(button1, "click", /*loginGoogle*/ ctx[15]),
+					listen(button2, "click", /*loginAnon*/ ctx[14])
 				];
 
 				mounted = true;
@@ -197,102 +203,128 @@ function create_if_block_1(ctx) {
 		},
 		p: noop,
 		d(detaching) {
-			if (detaching) detach(div2);
-			if (detaching) detach(t6);
-			if (detaching) detach(div3);
+			if (detaching) detach(div5);
+			if (detaching) detach(t8);
+			if (detaching) detach(div6);
 			mounted = false;
 			run_all(dispose);
 		}
 	};
 }
 
-// (199:2) {#if showSettingsModal}
+// (223:2) {#if showSettingsModal}
 function create_if_block(ctx) {
-	let div2;
+	let div5;
+	let div4;
 	let div0;
 	let t0;
-	let span;
+	let button0;
 	let t2;
-	let div1;
-	let label;
-	let t4;
-	let input;
-	let t5;
-	let button;
-	let t7;
 	let div3;
+	let div2;
+	let input;
+	let t3;
+	let button1;
+	let fa;
+	let t4;
+	let div1;
+	let t6;
+	let div6;
+	let current;
 	let mounted;
 	let dispose;
 
+	fa = new Fa({
+			props: { class: "inline-flex", icon: faTurnDown }
+		});
+
 	return {
 		c() {
-			div2 = element("div");
+			div5 = element("div");
+			div4 = element("div");
 			div0 = element("div");
-			t0 = text("Settings\n        ");
-			span = element("span");
-			span.textContent = "×";
+			t0 = text("Settings\n          ");
+			button0 = element("button");
+			button0.innerHTML = `<span aria-hidden="true">×</span>`;
 			t2 = space();
-			div1 = element("div");
-			label = element("label");
-			label.textContent = "Display Name";
-			t4 = space();
-			input = element("input");
-			t5 = space();
-			button = element("button");
-			button.textContent = "Change Name";
-			t7 = space();
 			div3 = element("div");
-			attr(span, "aria-hidden", "true");
-			attr(div0, "class", "modalHeader svelte-61gyc5");
-			attr(label, "for", "nickname");
+			div2 = element("div");
+			input = element("input");
+			t3 = space();
+			button1 = element("button");
+			create_component(fa.$$.fragment);
+			t4 = space();
+			div1 = element("div");
+			div1.textContent = "Change Name";
+			t6 = space();
+			div6 = element("div");
+			attr(button0, "class", "p-1 ml-auto bg-transparent border-0 text-black opacity-2 float-right text-3xl leading-none font-semibold outline-none focus:outline-none");
+			attr(div0, "class", "flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t text-4xl");
 			attr(input, "type", "text");
-			attr(input, "name", "nickname");
-			attr(input, "placeholder", /*username*/ ctx[7]);
-			attr(input, "class", "nicknameInput svelte-61gyc5");
-			attr(button, "class", "nameChangeBtn svelte-61gyc5");
-			attr(div1, "class", "modalContent svelte-61gyc5");
-			attr(div2, "class", "modalWrapper svelte-61gyc5");
-			attr(div3, "class", "preventative-div svelte-61gyc5");
+			attr(input, "placeholder", /*username*/ ctx[8]);
+			attr(input, "class", "px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full inline-flex");
+			attr(div1, "class", "inline-flex");
+			attr(button1, "class", "bg-amber-300 text-white active:bg-amber-400 font-bold uppercase text-sm px-6 py-3 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 inline-flex");
+			attr(button1, "type", "button");
+			attr(div2, "class", "mb-3 pt-0");
+			attr(div3, "class", "relative p-6 flex-auto");
+			attr(div4, "class", "relative w-auto my-6 mx-auto max-w-3xl bg-slate-50 rounded-md");
+			attr(div5, "class", "overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex");
+			attr(div6, "class", "opacity-25 fixed inset-0 z-40 bg-black");
 		},
 		m(target, anchor) {
-			insert(target, div2, anchor);
-			append(div2, div0);
+			insert(target, div5, anchor);
+			append(div5, div4);
+			append(div4, div0);
 			append(div0, t0);
-			append(div0, span);
-			append(div2, t2);
-			append(div2, div1);
-			append(div1, label);
-			append(div1, t4);
-			append(div1, input);
-			set_input_value(input, /*nameInput*/ ctx[6]);
-			append(div1, t5);
-			append(div1, button);
-			insert(target, t7, anchor);
-			insert(target, div3, anchor);
+			append(div0, button0);
+			append(div4, t2);
+			append(div4, div3);
+			append(div3, div2);
+			append(div2, input);
+			set_input_value(input, /*nameInput*/ ctx[7]);
+			append(div2, t3);
+			append(div2, button1);
+			mount_component(fa, button1, null);
+			append(button1, t4);
+			append(button1, div1);
+			insert(target, t6, anchor);
+			insert(target, div6, anchor);
+			current = true;
 
 			if (!mounted) {
 				dispose = [
-					listen(span, "click", /*toggleSettingsModal*/ ctx[10]),
-					listen(input, "input", /*input_input_handler*/ ctx[19]),
-					listen(button, "click", /*click_handler*/ ctx[20])
+					listen(button0, "click", /*toggleSettingsModal*/ ctx[11]),
+					listen(input, "input", /*input_input_handler*/ ctx[20]),
+					listen(div1, "click", /*click_handler*/ ctx[21])
 				];
 
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty[0] & /*username*/ 128) {
-				attr(input, "placeholder", /*username*/ ctx[7]);
+			if (!current || dirty[0] & /*username*/ 256) {
+				attr(input, "placeholder", /*username*/ ctx[8]);
 			}
 
-			if (dirty[0] & /*nameInput*/ 64 && input.value !== /*nameInput*/ ctx[6]) {
-				set_input_value(input, /*nameInput*/ ctx[6]);
+			if (dirty[0] & /*nameInput*/ 128 && input.value !== /*nameInput*/ ctx[7]) {
+				set_input_value(input, /*nameInput*/ ctx[7]);
 			}
 		},
+		i(local) {
+			if (current) return;
+			transition_in(fa.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(fa.$$.fragment, local);
+			current = false;
+		},
 		d(detaching) {
-			if (detaching) detach(div2);
-			if (detaching) detach(t7);
-			if (detaching) detach(div3);
+			if (detaching) detach(div5);
+			destroy_component(fa);
+			if (detaching) detach(t6);
+			if (detaching) detach(div6);
 			mounted = false;
 			run_all(dispose);
 		}
@@ -311,13 +343,13 @@ function create_fragment(ctx) {
 	let dispose;
 
 	function select_block_type(ctx, dirty) {
-		if (/*username*/ ctx[7] != "") return create_if_block_2;
+		if (/*username*/ ctx[8] != "") return create_if_block_2;
 		return create_else_block;
 	}
 
 	let current_block_type = select_block_type(ctx, [-1, -1]);
 	let if_block0 = current_block_type(ctx);
-	var switch_value = /*Menus*/ ctx[8][currentMenu];
+	var switch_value = /*Menus*/ ctx[9][/*currentMenu*/ ctx[0]];
 
 	function switch_props(ctx) {
 		return {};
@@ -327,8 +359,8 @@ function create_fragment(ctx) {
 		switch_instance = new switch_value(switch_props(ctx));
 	}
 
-	let if_block1 = /*showSignInModal*/ ctx[4] && create_if_block_1(ctx);
-	let if_block2 = /*showSettingsModal*/ ctx[5] && create_if_block(ctx);
+	let if_block1 = /*showSignInModal*/ ctx[5] && create_if_block_1(ctx);
+	let if_block2 = /*showSettingsModal*/ ctx[6] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -342,14 +374,14 @@ function create_fragment(ctx) {
 			t2 = space();
 			if (if_block2) if_block2.c();
 			attr(div0, "id", "userStub");
-			attr(div0, "class", "svelte-61gyc5");
-			attr(div1, "class", "screen svelte-61gyc5");
+			attr(div0, "class", "svelte-cs9num");
+			attr(div1, "class", "screen svelte-cs9num");
 		},
 		m(target, anchor) {
 			insert(target, div1, anchor);
 			append(div1, div0);
 			if_block0.m(div0, null);
-			/*div0_binding*/ ctx[18](div0);
+			/*div0_binding*/ ctx[19](div0);
 			append(div1, t0);
 
 			if (switch_instance) {
@@ -363,7 +395,7 @@ function create_fragment(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div0, "click", /*toggleAccDrop*/ ctx[11]);
+				dispose = listen(div0, "click", /*toggleAccDrop*/ ctx[12]);
 				mounted = true;
 			}
 		},
@@ -380,7 +412,7 @@ function create_fragment(ctx) {
 				}
 			}
 
-			if (switch_value !== (switch_value = /*Menus*/ ctx[8][currentMenu])) {
+			if (switch_value !== (switch_value = /*Menus*/ ctx[9][/*currentMenu*/ ctx[0]])) {
 				if (switch_instance) {
 					group_outros();
 					const old_component = switch_instance;
@@ -404,7 +436,7 @@ function create_fragment(ctx) {
 				
 			}
 
-			if (/*showSignInModal*/ ctx[4]) {
+			if (/*showSignInModal*/ ctx[5]) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
@@ -417,32 +449,44 @@ function create_fragment(ctx) {
 				if_block1 = null;
 			}
 
-			if (/*showSettingsModal*/ ctx[5]) {
+			if (/*showSettingsModal*/ ctx[6]) {
 				if (if_block2) {
 					if_block2.p(ctx, dirty);
+
+					if (dirty[0] & /*showSettingsModal*/ 64) {
+						transition_in(if_block2, 1);
+					}
 				} else {
 					if_block2 = create_if_block(ctx);
 					if_block2.c();
+					transition_in(if_block2, 1);
 					if_block2.m(div1, null);
 				}
 			} else if (if_block2) {
-				if_block2.d(1);
-				if_block2 = null;
+				group_outros();
+
+				transition_out(if_block2, 1, 1, () => {
+					if_block2 = null;
+				});
+
+				check_outros();
 			}
 		},
 		i(local) {
 			if (current) return;
 			if (switch_instance) transition_in(switch_instance.$$.fragment, local);
+			transition_in(if_block2);
 			current = true;
 		},
 		o(local) {
 			if (switch_instance) transition_out(switch_instance.$$.fragment, local);
+			transition_out(if_block2);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div1);
 			if_block0.d();
-			/*div0_binding*/ ctx[18](null);
+			/*div0_binding*/ ctx[19](null);
 			if (switch_instance) destroy_component(switch_instance);
 			if (if_block1) if_block1.d();
 			if (if_block2) if_block2.d();
@@ -451,8 +495,6 @@ function create_fragment(ctx) {
 		}
 	};
 }
-
-var currentMenu = 0;
 
 function instance($$self, $$props, $$invalidate) {
 	const firebaseConfig = {
@@ -465,7 +507,13 @@ function instance($$self, $$props, $$invalidate) {
 		measurementId: "G-ER3VK8XS20"
 	};
 
-	const Menus = [TitleScreen];
+	const Menus = [TitleScreen, LobbyList];
+	var currentMenu = 0;
+
+	Screen.subscribe(value => {
+		$$invalidate(0, currentMenu = value);
+	});
+
 	const app = initializeApp(firebaseConfig);
 	const database = getDatabase();
 	const google = new GoogleAuthProvider();
@@ -518,16 +566,16 @@ function instance($$self, $$props, $$invalidate) {
 	let nameInput;
 
 	function toggleSignInModal() {
-		$$invalidate(4, showSignInModal = !showSignInModal);
+		$$invalidate(5, showSignInModal = !showSignInModal);
 	}
 
 	function toggleSettingsModal() {
-		$$invalidate(5, showSettingsModal = !showSettingsModal);
+		$$invalidate(6, showSettingsModal = !showSettingsModal);
 		SettingsModal.set(showSettingsModal);
 	}
 
 	SettingsModal.subscribe(value => {
-		$$invalidate(5, showSettingsModal = value);
+		$$invalidate(6, showSettingsModal = value);
 	});
 
 	const toggleAccDrop = () => {
@@ -537,19 +585,10 @@ function instance($$self, $$props, $$invalidate) {
 			}
 
 			if (accDropShow) {
-				$$invalidate(0, accDropShow = false);
+				$$invalidate(1, accDropShow = false);
 			} else {
-				$$invalidate(0, accDropShow = true);
-
-				createPopper(stubRef, accDropRef, {
-					placement: "bottom-start",
-					modifiers: [
-						{
-							name: "offset",
-							options: { offset: [20, 20] }
-						}
-					]
-				});
+				$$invalidate(1, accDropShow = true);
+				createPopper(stubRef, accDropRef, { placement: "bottom-start" });
 			}
 		}
 	};
@@ -605,38 +644,41 @@ function instance($$self, $$props, $$invalidate) {
 	var username = "";
 
 	UserDisplayName.subscribe(value => {
-		$$invalidate(7, username = value);
+		$$invalidate(8, username = value);
 	});
 
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			accDropRef = $$value;
-			$$invalidate(2, accDropRef);
+			$$invalidate(3, accDropRef);
 		});
 	}
 
 	function button_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			signInBtn = $$value;
-			$$invalidate(3, signInBtn);
+			$$invalidate(4, signInBtn);
 		});
 	}
 
 	function div0_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
 			stubRef = $$value;
-			$$invalidate(1, stubRef);
+			$$invalidate(2, stubRef);
 		});
 	}
 
 	function input_input_handler() {
 		nameInput = this.value;
-		$$invalidate(6, nameInput);
+		$$invalidate(7, nameInput);
 	}
 
-	const click_handler = () => changeName(nameInput);
+	const click_handler = () => {
+		changeName(nameInput);
+	};
 
 	return [
+		currentMenu,
 		accDropShow,
 		stubRef,
 		accDropRef,

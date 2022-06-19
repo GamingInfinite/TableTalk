@@ -24,6 +24,27 @@ function null_to_empty(value) {
 function append(target, node) {
   target.appendChild(node);
 }
+function append_styles(target, style_sheet_id, styles) {
+  const append_styles_to = get_root_for_style(target);
+  if (!append_styles_to.getElementById(style_sheet_id)) {
+    const style = element("style");
+    style.id = style_sheet_id;
+    style.textContent = styles;
+    append_stylesheet(append_styles_to, style);
+  }
+}
+function get_root_for_style(node) {
+  if (!node)
+    return document;
+  const root = node.getRootNode ? node.getRootNode() : node.ownerDocument;
+  if (root && root.host) {
+    return root;
+  }
+  return node.ownerDocument;
+}
+function append_stylesheet(node, style) {
+  append(node.head || node, style);
+}
 function insert(target, node, anchor) {
   target.insertBefore(node, anchor || null);
 }
@@ -33,11 +54,17 @@ function detach(node) {
 function element(name) {
   return document.createElement(name);
 }
+function svg_element(name) {
+  return document.createElementNS("http://www.w3.org/2000/svg", name);
+}
 function text(data) {
   return document.createTextNode(data);
 }
 function space() {
   return text(" ");
+}
+function empty() {
+  return text("");
 }
 function listen(node, event, handler, options) {
   node.addEventListener(event, handler, options);
@@ -59,6 +86,9 @@ function set_data(text2, data) {
 }
 function set_input_value(input, value) {
   input.value = value == null ? "" : value;
+}
+function toggle_class(element2, name, toggle) {
+  element2.classList[toggle ? "add" : "remove"](name);
 }
 function custom_event(type, detail, {bubbles = false, cancelable = false} = {}) {
   const e = document.createEvent("CustomEvent");
@@ -345,4 +375,4 @@ class SvelteComponentTyped extends SvelteComponentDev {
   }
 }
 
-export { null_to_empty as A, run_all as B, safe_not_equal as C, set_data as D, set_input_value as E, space as F, text as G, transition_in as H, transition_out as I, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, append as j, attr as k, binding_callbacks as l, check_outros as m, create_component as n, onDestroy as o, destroy_component as p, detach as q, element as r, setContext as s, tick as t, group_outros as u, init as v, insert as w, listen as x, mount_component as y, noop as z };
+export { destroy_component as A, element as B, group_outros as C, listen as D, mount_component as E, run_all as F, set_data as G, set_input_value as H, space as I, text as J, transition_in as K, transition_out as L, null_to_empty as M, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, init as j, safe_not_equal as k, append_styles as l, svg_element as m, attr as n, onDestroy as o, toggle_class as p, insert as q, append as r, setContext as s, tick as t, detach as u, empty as v, noop as w, binding_callbacks as x, check_outros as y, create_component as z };
