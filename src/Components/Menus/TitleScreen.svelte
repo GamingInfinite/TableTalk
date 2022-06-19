@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Card, Deck } from "../../util";
-  import { UserDisplayName, SettingsModal } from "../../stores";
+  import { UserDisplayName, SettingsModal, Screen } from "../../stores";
   import { onMount } from "svelte";
 
   var username = "";
@@ -32,9 +32,20 @@
 
 <div class="title">TableTalk</div>
 <div class="buttons">
-  <button class={"playButton " + bandaid}>Play</button>
-  <br />
-  <button class={"settings " + bandaid} on:click={toggleSettings}>
+  <button
+    class={"bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " +
+      bandaid}
+    on:click={() => {
+      Screen.set(1);
+    }}
+  >
+    Play
+  </button>
+  <button
+    class={"bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " +
+      bandaid}
+    on:click={toggleSettings}
+  >
     Settings
   </button>
 </div>
@@ -43,28 +54,6 @@
   .title {
     padding-top: 10vh;
     padding-bottom: 10vh;
-  }
-
-  .playButton {
-    background-color: green;
-    border: none;
-    text-align: center;
-    width: 20vw;
-    font-family: "Roboto", sans-serif;
-    font-size: 50px;
-    color: black;
-    border-radius: 20px;
-  }
-
-  .settings {
-    background-color: blue;
-    border: none;
-    text-align: center;
-    width: 20vw;
-    font-family: "Roboto", sans-serif;
-    font-size: 50px;
-    color: black;
-    border-radius: 20px;
   }
 
   .disabled {
