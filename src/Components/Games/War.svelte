@@ -1,4 +1,5 @@
 <script lang="ts">
+  //lol
   var SUITS = {
     SPADES: "Spades",
     HEARTS: "Hearts",
