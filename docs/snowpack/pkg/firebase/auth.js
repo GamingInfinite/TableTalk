@@ -1,4 +1,4 @@
-import { b as getModularInstance, g as getApp, a as _getProvider, d as deepEqual, j as isMobileCordova, k as isReactNative, q as querystring, _ as _registerComponent, C as Component, S as SDK_VERSION, r as registerVersion, E as ErrorFactory, i as isBrowserExtension, F as FirebaseError, l as createSubscribe, m as LogLevel, n as base64Decode, p as getUA, s as isIE, L as Logger, t as isEmpty } from '../common/index.esm2017-102f85a9.js';
+import { b as getModularInstance, g as getApp, a as _getProvider, d as deepEqual, j as isMobileCordova, k as isReactNative, q as querystring, _ as _registerComponent, C as Component, S as SDK_VERSION, r as registerVersion, E as ErrorFactory, i as isBrowserExtension, F as FirebaseError, l as createSubscribe, m as LogLevel, n as base64Decode, p as getUA, s as isIE, L as Logger, t as isEmpty } from '../common/index.esm2017-b510f023.js';
 
 /******************************************************************************
 Copyright (c) Microsoft Corporation.

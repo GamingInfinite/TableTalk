@@ -1,4 +1,4 @@
-import { b as getModularInstance, D as Deferred, g as getApp, a as _getProvider, u as assert, w as base64, x as stringLength, y as errorPrefix, z as stringify, A as contains, _ as _registerComponent, C as Component, r as registerVersion, B as jsonEval, G as stringToByteArray, H as Sha1, I as safeGet, J as map, L as Logger, m as LogLevel, K as assertionError, M as isNodeSdk, N as isAdmin, O as isValidFormat, t as isEmpty, j as isMobileCordova, k as isReactNative, q as querystring, P as deepCopy, S as SDK_VERSION$1, Q as base64Encode } from '../common/index.esm2017-102f85a9.js';
+import { b as getModularInstance, D as Deferred, g as getApp, a as _getProvider, u as assert, w as base64, x as stringLength, y as errorPrefix, z as stringify, A as contains, _ as _registerComponent, C as Component, r as registerVersion, B as jsonEval, G as stringToByteArray, H as Sha1, I as safeGet, J as map, L as Logger, m as LogLevel, K as assertionError, M as isNodeSdk, N as isAdmin, O as isValidFormat, t as isEmpty, j as isMobileCordova, k as isReactNative, q as querystring, P as deepCopy, S as SDK_VERSION$1, Q as base64Encode } from '../common/index.esm2017-b510f023.js';
 
 /* SNOWPACK PROCESS POLYFILL (based on https://github.com/calvinmetcalf/node-process-es6) */
 function defaultSetTimout() {
@@ -6113,6 +6113,81 @@ const VALUE_INDEX = new ValueIndex();
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// Modeled after base64 web-safe chars, but ordered by ASCII.
+const PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+/**
+ * Fancy ID generator that creates 20-character string identifiers with the
+ * following properties:
+ *
+ * 1. They're based on timestamp so that they sort *after* any existing ids.
+ * 2. They contain 72-bits of random data after the timestamp so that IDs won't
+ *    collide with other clients' IDs.
+ * 3. They sort *lexicographically* (so the timestamp is converted to characters
+ *    that will sort properly).
+ * 4. They're monotonically increasing. Even if you generate more than one in
+ *    the same timestamp, the latter ones will sort after the former ones. We do
+ *    this by using the previous random bits but "incrementing" them by 1 (only
+ *    in the case of a timestamp collision).
+ */
+const nextPushId = (function () {
+    // Timestamp of last push, used to prevent local collisions if you push twice
+    // in one ms.
+    let lastPushTime = 0;
+    // We generate 72-bits of randomness which get turned into 12 characters and
+    // appended to the timestamp to prevent collisions with other clients. We
+    // store the last characters we generated because in the event of a collision,
+    // we'll use those same characters except "incremented" by one.
+    const lastRandChars = [];
+    return function (now) {
+        const duplicateTime = now === lastPushTime;
+        lastPushTime = now;
+        let i;
+        const timeStampChars = new Array(8);
+        for (i = 7; i >= 0; i--) {
+            timeStampChars[i] = PUSH_CHARS.charAt(now % 64);
+            // NOTE: Can't use << here because javascript will convert to int and lose
+            // the upper bits.
+            now = Math.floor(now / 64);
+        }
+        assert(now === 0, 'Cannot push at time == 0');
+        let id = timeStampChars.join('');
+        if (!duplicateTime) {
+            for (i = 0; i < 12; i++) {
+                lastRandChars[i] = Math.floor(Math.random() * 64);
+            }
+        }
+        else {
+            // If the timestamp hasn't changed since last push, use the same random
+            // number, except incremented by 1.
+            for (i = 11; i >= 0 && lastRandChars[i] === 63; i--) {
+                lastRandChars[i] = 0;
+            }
+            lastRandChars[i]++;
+        }
+        for (i = 0; i < 12; i++) {
+            id += PUSH_CHARS.charAt(lastRandChars[i]);
+        }
+        assert(id.length === 20, 'nextPushId: Length should be 20.');
+        return id;
+    };
+})();
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 function changeValue(snapshotNode) {
     return { type: "value" /* VALUE */, snapshotNode };
 }
@@ -11307,6 +11382,54 @@ function child(parent, path) {
     return new ReferenceImpl(parent._repo, pathChild(parent._path, path));
 }
 /**
+ * Generates a new child location using a unique key and returns its
+ * `Reference`.
+ *
+ * This is the most common pattern for adding data to a collection of items.
+ *
+ * If you provide a value to `push()`, the value is written to the
+ * generated location. If you don't pass a value, nothing is written to the
+ * database and the child remains empty (but you can use the `Reference`
+ * elsewhere).
+ *
+ * The unique keys generated by `push()` are ordered by the current time, so the
+ * resulting list of items is chronologically sorted. The keys are also
+ * designed to be unguessable (they contain 72 random bits of entropy).
+ *
+ * See {@link https://firebase.google.com/docs/database/web/lists-of-data#append_to_a_list_of_data | Append to a list of data}
+ * </br>See {@link ttps://firebase.googleblog.com/2015/02/the-2120-ways-to-ensure-unique_68.html | The 2^120 Ways to Ensure Unique Identifiers}
+ *
+ * @param parent - The parent location.
+ * @param value - Optional value to be written at the generated location.
+ * @returns Combined `Promise` and `Reference`; resolves when write is complete,
+ * but can be used immediately as the `Reference` to the child location.
+ */
+function push(parent, value) {
+    parent = getModularInstance(parent);
+    validateWritablePath('push', parent._path);
+    validateFirebaseDataArg('push', value, parent._path, true);
+    const now = repoServerTime(parent._repo);
+    const name = nextPushId(now);
+    // push() returns a ThennableReference whose promise is fulfilled with a
+    // regular Reference. We use child() to create handles to two different
+    // references. The first is turned into a ThennableReference below by adding
+    // then() and catch() methods and is used as the return value of push(). The
+    // second remains a regular Reference and is used as the fulfilled value of
+    // the first ThennableReference.
+    const thennablePushRef = child(parent, name);
+    const pushRef = child(parent, name);
+    let promise;
+    if (value != null) {
+        promise = set(pushRef, value).then(() => pushRef);
+    }
+    else {
+        promise = Promise.resolve(pushRef);
+    }
+    thennablePushRef.then = promise.then.bind(promise);
+    thennablePushRef.catch = promise.then.bind(promise, undefined);
+    return thennablePushRef;
+}
+/**
  * Removes the data at this Database location.
  *
  * Any data at child locations will also be deleted.
@@ -11597,4 +11720,4 @@ PersistentConnection.prototype.echo = function (data, onEcho) {
  */
 registerDatabase();
 
-export { child, get, getDatabase, ref, remove, set };
+export { child, get, getDatabase, push, ref, remove, set };

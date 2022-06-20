@@ -1,4 +1,4 @@
-import { r as registerVersion, _ as _registerComponent, C as Component, a as _getProvider, E as ErrorFactory, F as FirebaseError, o as openDB, g as getApp, b as getModularInstance, d as deepEqual, L as Logger, i as isBrowserExtension, c as calculateBackoffMillis, e as isIndexedDBAvailable, v as validateIndexedDBOpenable, f as areCookiesEnabled } from '../common/index.esm2017-102f85a9.js';
+import { r as registerVersion, _ as _registerComponent, C as Component, a as _getProvider, E as ErrorFactory, F as FirebaseError, o as openDB, g as getApp, b as getModularInstance, d as deepEqual, i as isBrowserExtension, c as areCookiesEnabled, e as isIndexedDBAvailable, v as validateIndexedDBOpenable, L as Logger, f as calculateBackoffMillis } from '../common/index.esm2017-b510f023.js';
 
 const name = "@firebase/installations";
 const version = "0.5.10";
@@ -1720,6 +1720,29 @@ let wrappedGtagFunction;
  */
 let globalInitDone = false;
 /**
+ * Configures Firebase Analytics to use custom `gtag` or `dataLayer` names.
+ * Intended to be used if `gtag.js` script has been installed on
+ * this page independently of Firebase Analytics, and is using non-default
+ * names for either the `gtag` function or for `dataLayer`.
+ * Must be called before calling `getAnalytics()` or it won't
+ * have any effect.
+ *
+ * @public
+ *
+ * @param options - Custom gtag and dataLayer names.
+ */
+function settings(options) {
+    if (globalInitDone) {
+        throw ERROR_FACTORY$1.create("already-initialized" /* ALREADY_INITIALIZED */);
+    }
+    if (options.dataLayerName) {
+        dataLayerName = options.dataLayerName;
+    }
+    if (options.gtagName) {
+        gtagName = options.gtagName;
+    }
+}
+/**
  * Returns true if no environment mismatch is found.
  * If environment mismatches are found, throws an INVALID_ANALYTICS_CONTEXT
  * error that also lists details for each mismatch found.
@@ -1817,6 +1840,80 @@ async function logEvent$1(gtagFunction, initializationPromise, eventName, eventP
         gtagFunction("event" /* EVENT */, eventName, params);
     }
 }
+/**
+ * Set screen_name parameter for this Google Analytics ID.
+ *
+ * @deprecated Use {@link logEvent} with `eventName` as 'screen_view' and add relevant `eventParams`.
+ * See {@link https://firebase.google.com/docs/analytics/screenviews | Track Screenviews}.
+ *
+ * @param gtagFunction Wrapped gtag function that waits for fid to be set before sending an event
+ * @param screenName Screen name string to set.
+ */
+async function setCurrentScreen$1(gtagFunction, initializationPromise, screenName, options) {
+    if (options && options.global) {
+        gtagFunction("set" /* SET */, { 'screen_name': screenName });
+        return Promise.resolve();
+    }
+    else {
+        const measurementId = await initializationPromise;
+        gtagFunction("config" /* CONFIG */, measurementId, {
+            update: true,
+            'screen_name': screenName
+        });
+    }
+}
+/**
+ * Set user_id parameter for this Google Analytics ID.
+ *
+ * @param gtagFunction Wrapped gtag function that waits for fid to be set before sending an event
+ * @param id User ID string to set
+ */
+async function setUserId$1(gtagFunction, initializationPromise, id, options) {
+    if (options && options.global) {
+        gtagFunction("set" /* SET */, { 'user_id': id });
+        return Promise.resolve();
+    }
+    else {
+        const measurementId = await initializationPromise;
+        gtagFunction("config" /* CONFIG */, measurementId, {
+            update: true,
+            'user_id': id
+        });
+    }
+}
+/**
+ * Set all other user properties other than user_id and screen_name.
+ *
+ * @param gtagFunction Wrapped gtag function that waits for fid to be set before sending an event
+ * @param properties Map of user properties to set
+ */
+async function setUserProperties$1(gtagFunction, initializationPromise, properties, options) {
+    if (options && options.global) {
+        const flatProperties = {};
+        for (const key of Object.keys(properties)) {
+            // use dot notation for merge behavior in gtag.js
+            flatProperties[`user_properties.${key}`] = properties[key];
+        }
+        gtagFunction("set" /* SET */, flatProperties);
+        return Promise.resolve();
+    }
+    else {
+        const measurementId = await initializationPromise;
+        gtagFunction("config" /* CONFIG */, measurementId, {
+            update: true,
+            'user_properties': properties
+        });
+    }
+}
+/**
+ * Set whether collection is enabled for this ID.
+ *
+ * @param enabled If true, collection is enabled for this ID.
+ */
+async function setAnalyticsCollectionEnabled$1(initializationPromise, enabled) {
+    const measurementId = await initializationPromise;
+    window[`ga-disable-${measurementId}`] = !enabled;
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
@@ -1856,6 +1953,84 @@ function initializeAnalytics(app, options = {}) {
     }
     const analyticsInstance = analyticsProvider.initialize({ options });
     return analyticsInstance;
+}
+/**
+ * This is a public static method provided to users that wraps four different checks:
+ *
+ * 1. Check if it's not a browser extension environment.
+ * 2. Check if cookies are enabled in current browser.
+ * 3. Check if IndexedDB is supported by the browser environment.
+ * 4. Check if the current browser context is valid for using `IndexedDB.open()`.
+ *
+ * @public
+ *
+ */
+async function isSupported() {
+    if (isBrowserExtension()) {
+        return false;
+    }
+    if (!areCookiesEnabled()) {
+        return false;
+    }
+    if (!isIndexedDBAvailable()) {
+        return false;
+    }
+    try {
+        const isDBOpenable = await validateIndexedDBOpenable();
+        return isDBOpenable;
+    }
+    catch (error) {
+        return false;
+    }
+}
+/**
+ * Use gtag `config` command to set `screen_name`.
+ *
+ * @public
+ *
+ * @deprecated Use {@link logEvent} with `eventName` as 'screen_view' and add relevant `eventParams`.
+ * See {@link https://firebase.google.com/docs/analytics/screenviews | Track Screenviews}.
+ *
+ * @param analyticsInstance - The {@link Analytics} instance.
+ * @param screenName - Screen name to set.
+ */
+function setCurrentScreen(analyticsInstance, screenName, options) {
+    analyticsInstance = getModularInstance(analyticsInstance);
+    setCurrentScreen$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], screenName, options).catch(e => logger.error(e));
+}
+/**
+ * Use gtag `config` command to set `user_id`.
+ *
+ * @public
+ *
+ * @param analyticsInstance - The {@link Analytics} instance.
+ * @param id - User ID to set.
+ */
+function setUserId(analyticsInstance, id, options) {
+    analyticsInstance = getModularInstance(analyticsInstance);
+    setUserId$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], id, options).catch(e => logger.error(e));
+}
+/**
+ * Use gtag `config` command to set all params specified.
+ *
+ * @public
+ */
+function setUserProperties(analyticsInstance, properties, options) {
+    analyticsInstance = getModularInstance(analyticsInstance);
+    setUserProperties$1(wrappedGtagFunction, initializationPromisesMap[analyticsInstance.app.options.appId], properties, options).catch(e => logger.error(e));
+}
+/**
+ * Sets whether Google Analytics collection is enabled for this app on this device.
+ * Sets global `window['ga-disable-analyticsId'] = true;`
+ *
+ * @public
+ *
+ * @param analyticsInstance - The {@link Analytics} instance.
+ * @param enabled - If true, enables collection, if false, disables it.
+ */
+function setAnalyticsCollectionEnabled(analyticsInstance, enabled) {
+    analyticsInstance = getModularInstance(analyticsInstance);
+    setAnalyticsCollectionEnabled$1(initializationPromisesMap[analyticsInstance.app.options.appId], enabled).catch(e => logger.error(e));
 }
 /**
  * Sends a Google Analytics event with given `eventParams`. This method
@@ -1910,4 +2085,4 @@ function registerAnalytics() {
 }
 registerAnalytics();
 
-export { getAnalytics };
+export { getAnalytics, initializeAnalytics, isSupported, logEvent, setAnalyticsCollectionEnabled, setCurrentScreen, setUserId, setUserProperties, settings };

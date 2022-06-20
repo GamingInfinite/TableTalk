@@ -1,5 +1,5 @@
-import { r as registerVersion } from '../common/index.esm2017-102f85a9.js';
-export { h as initializeApp } from '../common/index.esm2017-102f85a9.js';
+import { r as registerVersion } from '../common/index.esm2017-b510f023.js';
+export { h as initializeApp } from '../common/index.esm2017-b510f023.js';
 
 var name = "firebase";
 var version = "9.8.3";

@@ -18,8 +18,15 @@ function safe_not_equal(a, b) {
 function is_empty(obj) {
   return Object.keys(obj).length === 0;
 }
-function null_to_empty(value) {
-  return value == null ? "" : value;
+function subscribe(store, ...callbacks) {
+  if (store == null) {
+    return noop;
+  }
+  const unsub = store.subscribe(...callbacks);
+  return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+}
+function component_subscribe(component, store, callback) {
+  component.$$.on_destroy.push(subscribe(store, callback));
 }
 function append(target, node) {
   target.appendChild(node);
@@ -241,6 +248,77 @@ function transition_out(block, local, detach2, callback) {
     block.o(local);
   }
 }
+function destroy_block(block, lookup) {
+  block.d(1);
+  lookup.delete(block.key);
+}
+function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block, next, get_context) {
+  let o = old_blocks.length;
+  let n = list.length;
+  let i = o;
+  const old_indexes = {};
+  while (i--)
+    old_indexes[old_blocks[i].key] = i;
+  const new_blocks = [];
+  const new_lookup = new Map();
+  const deltas = new Map();
+  i = n;
+  while (i--) {
+    const child_ctx = get_context(ctx, list, i);
+    const key = get_key(child_ctx);
+    let block = lookup.get(key);
+    if (!block) {
+      block = create_each_block(key, child_ctx);
+      block.c();
+    } else if (dynamic) {
+      block.p(child_ctx, dirty);
+    }
+    new_lookup.set(key, new_blocks[i] = block);
+    if (key in old_indexes)
+      deltas.set(key, Math.abs(i - old_indexes[key]));
+  }
+  const will_move = new Set();
+  const did_move = new Set();
+  function insert2(block) {
+    transition_in(block, 1);
+    block.m(node, next);
+    lookup.set(block.key, block);
+    next = block.first;
+    n--;
+  }
+  while (o && n) {
+    const new_block = new_blocks[n - 1];
+    const old_block = old_blocks[o - 1];
+    const new_key = new_block.key;
+    const old_key = old_block.key;
+    if (new_block === old_block) {
+      next = new_block.first;
+      o--;
+      n--;
+    } else if (!new_lookup.has(old_key)) {
+      destroy(old_block, lookup);
+      o--;
+    } else if (!lookup.has(new_key) || will_move.has(new_key)) {
+      insert2(new_block);
+    } else if (did_move.has(old_key)) {
+      o--;
+    } else if (deltas.get(new_key) > deltas.get(old_key)) {
+      did_move.add(new_key);
+      insert2(new_block);
+    } else {
+      will_move.add(old_key);
+      o--;
+    }
+  }
+  while (o--) {
+    const old_block = old_blocks[o];
+    if (!new_lookup.has(old_block.key))
+      destroy(old_block, lookup);
+  }
+  while (n)
+    insert2(new_blocks[n - 1]);
+  return new_blocks;
+}
 function create_component(block) {
   block && block.c();
 }
@@ -375,4 +453,4 @@ class SvelteComponentTyped extends SvelteComponentDev {
   }
 }
 
-export { destroy_component as A, element as B, group_outros as C, listen as D, mount_component as E, run_all as F, set_data as G, set_input_value as H, space as I, text as J, transition_in as K, transition_out as L, null_to_empty as M, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, init as j, safe_not_equal as k, append_styles as l, svg_element as m, attr as n, onDestroy as o, toggle_class as p, insert as q, append as r, setContext as s, tick as t, detach as u, empty as v, noop as w, binding_callbacks as x, check_outros as y, create_component as z };
+export { create_component as A, destroy_component as B, element as C, group_outros as D, listen as E, mount_component as F, run_all as G, set_data as H, space as I, text as J, transition_in as K, transition_out as L, destroy_block as M, set_input_value as N, update_keyed_each as O, SvelteComponentDev as S, SvelteComponentTyped as a, afterUpdate as b, beforeUpdate as c, createEventDispatcher as d, getContext as e, onMount as f, getAllContexts as g, hasContext as h, SvelteComponent as i, init as j, safe_not_equal as k, append_styles as l, svg_element as m, attr as n, onDestroy as o, toggle_class as p, insert as q, append as r, setContext as s, tick as t, detach as u, empty as v, noop as w, binding_callbacks as x, check_outros as y, component_subscribe as z };

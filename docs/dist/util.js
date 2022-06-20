@@ -53,3 +53,13 @@ export class Deck {
     this.deck = randDeck;
   }
 }
+export class Hand {
+  getTop() {
+    let top = this.hand[0];
+    this.hand.shift();
+    return top;
+  }
+  add(adds) {
+    this.hand = this.hand.concat(adds);
+  }
+}

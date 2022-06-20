@@ -4,36 +4,164 @@ import {
 	SvelteComponent,
 	append,
 	attr,
+	check_outros,
+	component_subscribe,
+	create_component,
+	destroy_component,
 	detach,
 	element,
+	group_outros,
 	init,
 	insert,
 	listen,
-	noop,
-	null_to_empty,
+	mount_component,
 	run_all,
 	safe_not_equal,
+	set_input_value,
 	space,
-	text
+	text,
+	toggle_class,
+	transition_in,
+	transition_out
 } from "../../../snowpack/pkg/svelte/internal.js";
 
 import { Deck } from "../../util.js";
-import { UserDisplayName, SettingsModal, Screen } from "../../stores.js";
+import { UserDisplayName, Screen, playerRef } from "../../stores.js";
 import "../../../snowpack/pkg/svelte.js";
+import { set } from "../../../snowpack/pkg/firebase/database.js";
+import Fa from "../../../snowpack/pkg/svelte-fa.js";
+import { faTurnDown } from "../../../snowpack/pkg/@fortawesome/free-solid-svg-icons/index.es.js";
+
+function create_if_block(ctx) {
+	let div5;
+	let div4;
+	let div0;
+	let t0;
+	let button0;
+	let t2;
+	let div3;
+	let div2;
+	let input;
+	let t3;
+	let button1;
+	let fa;
+	let t4;
+	let div1;
+	let t6;
+	let div6;
+	let current;
+	let mounted;
+	let dispose;
+
+	fa = new Fa({
+			props: { class: "inline-flex", icon: faTurnDown }
+		});
+
+	return {
+		c() {
+			div5 = element("div");
+			div4 = element("div");
+			div0 = element("div");
+			t0 = text("Settings\n          ");
+			button0 = element("button");
+			button0.innerHTML = `<span aria-hidden="true">×</span>`;
+			t2 = space();
+			div3 = element("div");
+			div2 = element("div");
+			input = element("input");
+			t3 = space();
+			button1 = element("button");
+			create_component(fa.$$.fragment);
+			t4 = space();
+			div1 = element("div");
+			div1.textContent = "Change Name";
+			t6 = space();
+			div6 = element("div");
+			attr(button0, "class", "p-1 ml-auto bg-transparent border-0 text-black opacity-2 float-right text-3xl leading-none font-semibold outline-none focus:outline-none");
+			attr(div0, "class", "flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t text-4xl");
+			attr(input, "type", "text");
+			attr(input, "placeholder", /*username*/ ctx[0]);
+			attr(input, "class", "px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full inline-flex");
+			attr(div1, "class", "inline-flex");
+			attr(button1, "class", "bg-amber-300 text-white active:bg-amber-400 font-bold uppercase text-sm px-6 py-3 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 inline-flex");
+			attr(button1, "type", "button");
+			attr(div2, "class", "mb-3 pt-0");
+			attr(div3, "class", "relative p-6 flex-auto");
+			attr(div4, "class", "relative w-auto my-6 mx-auto max-w-3xl bg-slate-50 rounded-md");
+			attr(div5, "class", "overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex");
+			attr(div6, "class", "opacity-25 fixed inset-0 z-40 bg-black");
+		},
+		m(target, anchor) {
+			insert(target, div5, anchor);
+			append(div5, div4);
+			append(div4, div0);
+			append(div0, t0);
+			append(div0, button0);
+			append(div4, t2);
+			append(div4, div3);
+			append(div3, div2);
+			append(div2, input);
+			set_input_value(input, /*nameInput*/ ctx[1]);
+			append(div2, t3);
+			append(div2, button1);
+			mount_component(fa, button1, null);
+			append(button1, t4);
+			append(button1, div1);
+			insert(target, t6, anchor);
+			insert(target, div6, anchor);
+			current = true;
+
+			if (!mounted) {
+				dispose = [
+					listen(button0, "click", /*toggleSettingsModal*/ ctx[3]),
+					listen(input, "input", /*input_input_handler*/ ctx[6]),
+					listen(div1, "click", /*click_handler_1*/ ctx[7])
+				];
+
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (!current || dirty & /*username*/ 1) {
+				attr(input, "placeholder", /*username*/ ctx[0]);
+			}
+
+			if (dirty & /*nameInput*/ 2 && input.value !== /*nameInput*/ ctx[1]) {
+				set_input_value(input, /*nameInput*/ ctx[1]);
+			}
+		},
+		i(local) {
+			if (current) return;
+			transition_in(fa.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(fa.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) detach(div5);
+			destroy_component(fa);
+			if (detaching) detach(t6);
+			if (detaching) detach(div6);
+			mounted = false;
+			run_all(dispose);
+		}
+	};
+}
 
 function create_fragment(ctx) {
 	let div0;
 	let t1;
 	let div1;
 	let button0;
-	let t2;
-	let button0_class_value;
 	let t3;
 	let button1;
-	let t4;
-	let button1_class_value;
+	let t5;
+	let current;
 	let mounted;
 	let dispose;
+	let if_block = /*showSettingsModal*/ ctx[2] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -42,13 +170,17 @@ function create_fragment(ctx) {
 			t1 = space();
 			div1 = element("div");
 			button0 = element("button");
-			t2 = text("Play");
+			button0.textContent = "Play";
 			t3 = space();
 			button1 = element("button");
-			t4 = text("Settings");
+			button1.textContent = "Settings";
+			t5 = space();
+			if (if_block) if_block.c();
 			attr(div0, "class", "title svelte-1lsurz4");
-			attr(button0, "class", button0_class_value = "" + (null_to_empty("bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"));
-			attr(button1, "class", button1_class_value = "" + (null_to_empty("bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"));
+			attr(button0, "class", "bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 svelte-1lsurz4");
+			toggle_class(button0, "disabled", /*username*/ ctx[0] == "");
+			attr(button1, "class", "bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 svelte-1lsurz4");
+			toggle_class(button1, "disabled", /*username*/ ctx[0] == "");
 			attr(div1, "class", "buttons");
 		},
 		m(target, anchor) {
@@ -56,35 +188,67 @@ function create_fragment(ctx) {
 			insert(target, t1, anchor);
 			insert(target, div1, anchor);
 			append(div1, button0);
-			append(button0, t2);
 			append(div1, t3);
 			append(div1, button1);
-			append(button1, t4);
+			append(div1, t5);
+			if (if_block) if_block.m(div1, null);
+			current = true;
 
 			if (!mounted) {
 				dispose = [
-					listen(button0, "click", /*click_handler*/ ctx[2]),
-					listen(button1, "click", /*toggleSettings*/ ctx[1])
+					listen(button0, "click", /*click_handler*/ ctx[5]),
+					listen(button1, "click", /*toggleSettingsModal*/ ctx[3])
 				];
 
 				mounted = true;
 			}
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*bandaid*/ 1 && button0_class_value !== (button0_class_value = "" + (null_to_empty("bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"))) {
-				attr(button0, "class", button0_class_value);
+			if (dirty & /*username*/ 1) {
+				toggle_class(button0, "disabled", /*username*/ ctx[0] == "");
 			}
 
-			if (dirty & /*bandaid*/ 1 && button1_class_value !== (button1_class_value = "" + (null_to_empty("bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 " + /*bandaid*/ ctx[0]) + " svelte-1lsurz4"))) {
-				attr(button1, "class", button1_class_value);
+			if (dirty & /*username*/ 1) {
+				toggle_class(button1, "disabled", /*username*/ ctx[0] == "");
+			}
+
+			if (/*showSettingsModal*/ ctx[2]) {
+				if (if_block) {
+					if_block.p(ctx, dirty);
+
+					if (dirty & /*showSettingsModal*/ 4) {
+						transition_in(if_block, 1);
+					}
+				} else {
+					if_block = create_if_block(ctx);
+					if_block.c();
+					transition_in(if_block, 1);
+					if_block.m(div1, null);
+				}
+			} else if (if_block) {
+				group_outros();
+
+				transition_out(if_block, 1, 1, () => {
+					if_block = null;
+				});
+
+				check_outros();
 			}
 		},
-		i: noop,
-		o: noop,
+		i(local) {
+			if (current) return;
+			transition_in(if_block);
+			current = true;
+		},
+		o(local) {
+			transition_out(if_block);
+			current = false;
+		},
 		d(detaching) {
 			if (detaching) detach(div0);
 			if (detaching) detach(t1);
 			if (detaching) detach(div1);
+			if (if_block) if_block.d();
 			mounted = false;
 			run_all(dispose);
 		}
@@ -92,29 +256,25 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
+	let $playerRef;
+	component_subscribe($$self, playerRef, $$value => $$invalidate(8, $playerRef = $$value));
 	var username = "";
 
 	UserDisplayName.subscribe(value => {
-		username = value;
-
-		if (username == "") {
-			$$invalidate(0, bandaid = "disabled");
-		} else {
-			$$invalidate(0, bandaid = "");
-		}
+		$$invalidate(0, username = value);
 	});
 
-	var bandaid = "disabled";
-	let settings = false;
+	let nameInput;
+	let showSettingsModal = false;
 
-	function toggleSettings() {
-		settings = !settings;
-		SettingsModal.set(settings);
+	function toggleSettingsModal() {
+		$$invalidate(2, showSettingsModal = !showSettingsModal);
 	}
 
-	SettingsModal.subscribe(value => {
-		settings = value;
-	});
+	function changeName(name) {
+		set($playerRef, { name });
+		UserDisplayName.set(name);
+	}
 
 	var testDeck = new Deck(true);
 	testDeck.shuffle();
@@ -123,7 +283,25 @@ function instance($$self, $$props, $$invalidate) {
 		Screen.set(1);
 	};
 
-	return [bandaid, toggleSettings, click_handler];
+	function input_input_handler() {
+		nameInput = this.value;
+		$$invalidate(1, nameInput);
+	}
+
+	const click_handler_1 = () => {
+		changeName(nameInput);
+	};
+
+	return [
+		username,
+		nameInput,
+		showSettingsModal,
+		toggleSettingsModal,
+		changeName,
+		click_handler,
+		input_input_handler,
+		click_handler_1
+	];
 }
 
 class TitleScreen extends SvelteComponent {

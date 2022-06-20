@@ -6,6 +6,7 @@ import {
 	attr,
 	binding_callbacks,
 	check_outros,
+	component_subscribe,
 	create_component,
 	destroy_component,
 	detach,
@@ -19,7 +20,6 @@ import {
 	run_all,
 	safe_not_equal,
 	set_data,
-	set_input_value,
 	space,
 	text,
 	transition_in,
@@ -28,13 +28,21 @@ import {
 
 import TitleScreen from "./Components/Menus/TitleScreen.svelte.js";
 import LobbyList from "./Components/Menus/LobbyList.svelte.js";
-import { UserDisplayName, SettingsModal, Screen } from "./stores.js";
-import Fa from "../snowpack/pkg/svelte-fa.js";
-import { faTurnDown } from "../snowpack/pkg/@fortawesome/free-solid-svg-icons/index.es.js";
-import { initializeApp } from "../snowpack/pkg/firebase/app.js";
+import Lobby from "./Components/Menus/Lobby.svelte.js";
 
 import {
-	getAuth,
+	UserDisplayName,
+	Screen,
+	db,
+	auth,
+	player,
+	playerID,
+	playerAnonStatus,
+	playerAvatarURL,
+	playerRef
+} from "./stores.js";
+
+import {
 	signInWithPopup,
 	GoogleAuthProvider,
 	signInAnonymously,
@@ -42,8 +50,8 @@ import {
 	deleteUser
 } from "../snowpack/pkg/firebase/auth.js";
 
-import { getDatabase, ref, set, get, remove, child } from "../snowpack/pkg/firebase/database.js";
-import { getAnalytics } from "../snowpack/pkg/firebase/analytics.js";
+import { ref, set, get, remove, child } from "../snowpack/pkg/firebase/database.js";
+import "../snowpack/pkg/firebase/analytics.js";
 import "../snowpack/pkg/svelte.js";
 import { createPopper } from "../snowpack/pkg/@popperjs/core.js";
 
@@ -56,29 +64,29 @@ function create_else_block(ctx) {
 		c() {
 			button = element("button");
 			button.textContent = "Sign In";
-			attr(button, "class", "signin svelte-cs9num");
+			attr(button, "class", "bg-indigo-700 text-white active:bg-indigo-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150");
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
-			/*button_binding*/ ctx[18](button);
+			/*button_binding*/ ctx[19](button);
 
 			if (!mounted) {
-				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[10]);
+				dispose = listen(button, "click", /*toggleSignInModal*/ ctx[12]);
 				mounted = true;
 			}
 		},
 		p: noop,
 		d(detaching) {
 			if (detaching) detach(button);
-			/*button_binding*/ ctx[18](null);
+			/*button_binding*/ ctx[19](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (152:4) {#if username != ""}
-function create_if_block_2(ctx) {
+// (121:4) {#if username != ""}
+function create_if_block_1(ctx) {
 	let t0;
 	let t1;
 	let div;
@@ -89,7 +97,7 @@ function create_if_block_2(ctx) {
 
 	return {
 		c() {
-			t0 = text(/*username*/ ctx[8]);
+			t0 = text(/*username*/ ctx[6]);
 			t1 = space();
 			div = element("div");
 			a = element("a");
@@ -103,17 +111,17 @@ function create_if_block_2(ctx) {
 			insert(target, t1, anchor);
 			insert(target, div, anchor);
 			append(div, a);
-			/*div_binding*/ ctx[17](div);
+			/*div_binding*/ ctx[18](div);
 
 			if (!mounted) {
-				dispose = listen(a, "click", /*logout*/ ctx[13]);
+				dispose = listen(a, "click", /*logout*/ ctx[14]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty[0] & /*username*/ 256) set_data(t0, /*username*/ ctx[8]);
+			if (dirty & /*username*/ 64) set_data(t0, /*username*/ ctx[6]);
 
-			if (dirty[0] & /*accDropShow*/ 2 && div_class_value !== (div_class_value = "bg-purple-500 text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1 min-w-48 " + (/*accDropShow*/ ctx[1] ? 'block' : 'hidden'))) {
+			if (dirty & /*accDropShow*/ 2 && div_class_value !== (div_class_value = "bg-purple-500 text-base z-50 float-left py-2 list-none text-left rounded shadow-lg mt-1 min-w-48 " + (/*accDropShow*/ ctx[1] ? 'block' : 'hidden'))) {
 				attr(div, "class", div_class_value);
 			}
 		},
@@ -121,15 +129,15 @@ function create_if_block_2(ctx) {
 			if (detaching) detach(t0);
 			if (detaching) detach(t1);
 			if (detaching) detach(div);
-			/*div_binding*/ ctx[17](null);
+			/*div_binding*/ ctx[18](null);
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (176:2) {#if showSignInModal}
-function create_if_block_1(ctx) {
+// (149:2) {#if showSignInModal}
+function create_if_block(ctx) {
 	let div5;
 	let div4;
 	let div0;
@@ -193,9 +201,9 @@ function create_if_block_1(ctx) {
 
 			if (!mounted) {
 				dispose = [
-					listen(button0, "click", /*toggleSignInModal*/ ctx[10]),
-					listen(button1, "click", /*loginGoogle*/ ctx[15]),
-					listen(button2, "click", /*loginAnon*/ ctx[14])
+					listen(button0, "click", /*toggleSignInModal*/ ctx[12]),
+					listen(button1, "click", /*loginGoogle*/ ctx[16]),
+					listen(button2, "click", /*loginAnon*/ ctx[15])
 				];
 
 				mounted = true;
@@ -212,144 +220,24 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (223:2) {#if showSettingsModal}
-function create_if_block(ctx) {
-	let div5;
-	let div4;
-	let div0;
-	let t0;
-	let button0;
-	let t2;
-	let div3;
-	let div2;
-	let input;
-	let t3;
-	let button1;
-	let fa;
-	let t4;
-	let div1;
-	let t6;
-	let div6;
-	let current;
-	let mounted;
-	let dispose;
-
-	fa = new Fa({
-			props: { class: "inline-flex", icon: faTurnDown }
-		});
-
-	return {
-		c() {
-			div5 = element("div");
-			div4 = element("div");
-			div0 = element("div");
-			t0 = text("Settings\n          ");
-			button0 = element("button");
-			button0.innerHTML = `<span aria-hidden="true">×</span>`;
-			t2 = space();
-			div3 = element("div");
-			div2 = element("div");
-			input = element("input");
-			t3 = space();
-			button1 = element("button");
-			create_component(fa.$$.fragment);
-			t4 = space();
-			div1 = element("div");
-			div1.textContent = "Change Name";
-			t6 = space();
-			div6 = element("div");
-			attr(button0, "class", "p-1 ml-auto bg-transparent border-0 text-black opacity-2 float-right text-3xl leading-none font-semibold outline-none focus:outline-none");
-			attr(div0, "class", "flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t text-4xl");
-			attr(input, "type", "text");
-			attr(input, "placeholder", /*username*/ ctx[8]);
-			attr(input, "class", "px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-full inline-flex");
-			attr(div1, "class", "inline-flex");
-			attr(button1, "class", "bg-amber-300 text-white active:bg-amber-400 font-bold uppercase text-sm px-6 py-3 rounded-full shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 inline-flex");
-			attr(button1, "type", "button");
-			attr(div2, "class", "mb-3 pt-0");
-			attr(div3, "class", "relative p-6 flex-auto");
-			attr(div4, "class", "relative w-auto my-6 mx-auto max-w-3xl bg-slate-50 rounded-md");
-			attr(div5, "class", "overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none justify-center items-center flex");
-			attr(div6, "class", "opacity-25 fixed inset-0 z-40 bg-black");
-		},
-		m(target, anchor) {
-			insert(target, div5, anchor);
-			append(div5, div4);
-			append(div4, div0);
-			append(div0, t0);
-			append(div0, button0);
-			append(div4, t2);
-			append(div4, div3);
-			append(div3, div2);
-			append(div2, input);
-			set_input_value(input, /*nameInput*/ ctx[7]);
-			append(div2, t3);
-			append(div2, button1);
-			mount_component(fa, button1, null);
-			append(button1, t4);
-			append(button1, div1);
-			insert(target, t6, anchor);
-			insert(target, div6, anchor);
-			current = true;
-
-			if (!mounted) {
-				dispose = [
-					listen(button0, "click", /*toggleSettingsModal*/ ctx[11]),
-					listen(input, "input", /*input_input_handler*/ ctx[20]),
-					listen(div1, "click", /*click_handler*/ ctx[21])
-				];
-
-				mounted = true;
-			}
-		},
-		p(ctx, dirty) {
-			if (!current || dirty[0] & /*username*/ 256) {
-				attr(input, "placeholder", /*username*/ ctx[8]);
-			}
-
-			if (dirty[0] & /*nameInput*/ 128 && input.value !== /*nameInput*/ ctx[7]) {
-				set_input_value(input, /*nameInput*/ ctx[7]);
-			}
-		},
-		i(local) {
-			if (current) return;
-			transition_in(fa.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(fa.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div5);
-			destroy_component(fa);
-			if (detaching) detach(t6);
-			if (detaching) detach(div6);
-			mounted = false;
-			run_all(dispose);
-		}
-	};
-}
-
 function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let t0;
 	let switch_instance;
 	let t1;
-	let t2;
 	let current;
 	let mounted;
 	let dispose;
 
 	function select_block_type(ctx, dirty) {
-		if (/*username*/ ctx[8] != "") return create_if_block_2;
+		if (/*username*/ ctx[6] != "") return create_if_block_1;
 		return create_else_block;
 	}
 
-	let current_block_type = select_block_type(ctx, [-1, -1]);
+	let current_block_type = select_block_type(ctx, -1);
 	let if_block0 = current_block_type(ctx);
-	var switch_value = /*Menus*/ ctx[9][/*currentMenu*/ ctx[0]];
+	var switch_value = /*Menus*/ ctx[11][/*currentMenu*/ ctx[0]];
 
 	function switch_props(ctx) {
 		return {};
@@ -359,8 +247,7 @@ function create_fragment(ctx) {
 		switch_instance = new switch_value(switch_props(ctx));
 	}
 
-	let if_block1 = /*showSignInModal*/ ctx[5] && create_if_block_1(ctx);
-	let if_block2 = /*showSettingsModal*/ ctx[6] && create_if_block(ctx);
+	let if_block1 = /*showSignInModal*/ ctx[5] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -371,17 +258,15 @@ function create_fragment(ctx) {
 			if (switch_instance) create_component(switch_instance.$$.fragment);
 			t1 = space();
 			if (if_block1) if_block1.c();
-			t2 = space();
-			if (if_block2) if_block2.c();
 			attr(div0, "id", "userStub");
-			attr(div0, "class", "svelte-cs9num");
-			attr(div1, "class", "screen svelte-cs9num");
+			attr(div0, "class", "svelte-qw6djw");
+			attr(div1, "class", "screen svelte-qw6djw");
 		},
 		m(target, anchor) {
 			insert(target, div1, anchor);
 			append(div1, div0);
 			if_block0.m(div0, null);
-			/*div0_binding*/ ctx[19](div0);
+			/*div0_binding*/ ctx[20](div0);
 			append(div1, t0);
 
 			if (switch_instance) {
@@ -390,16 +275,18 @@ function create_fragment(ctx) {
 
 			append(div1, t1);
 			if (if_block1) if_block1.m(div1, null);
-			append(div1, t2);
-			if (if_block2) if_block2.m(div1, null);
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(div0, "click", /*toggleAccDrop*/ ctx[12]);
+				dispose = [
+					listen(window, "beforeunload", /*beforeunload_handler*/ ctx[17]),
+					listen(div0, "click", /*toggleAccDrop*/ ctx[13])
+				];
+
 				mounted = true;
 			}
 		},
-		p(ctx, dirty) {
+		p(ctx, [dirty]) {
 			if (current_block_type === (current_block_type = select_block_type(ctx, dirty)) && if_block0) {
 				if_block0.p(ctx, dirty);
 			} else {
@@ -412,7 +299,7 @@ function create_fragment(ctx) {
 				}
 			}
 
-			if (switch_value !== (switch_value = /*Menus*/ ctx[9][/*currentMenu*/ ctx[0]])) {
+			if (switch_value !== (switch_value = /*Menus*/ ctx[11][/*currentMenu*/ ctx[0]])) {
 				if (switch_instance) {
 					group_outros();
 					const old_component = switch_instance;
@@ -440,115 +327,85 @@ function create_fragment(ctx) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_1(ctx);
+					if_block1 = create_if_block(ctx);
 					if_block1.c();
-					if_block1.m(div1, t2);
+					if_block1.m(div1, null);
 				}
 			} else if (if_block1) {
 				if_block1.d(1);
 				if_block1 = null;
 			}
-
-			if (/*showSettingsModal*/ ctx[6]) {
-				if (if_block2) {
-					if_block2.p(ctx, dirty);
-
-					if (dirty[0] & /*showSettingsModal*/ 64) {
-						transition_in(if_block2, 1);
-					}
-				} else {
-					if_block2 = create_if_block(ctx);
-					if_block2.c();
-					transition_in(if_block2, 1);
-					if_block2.m(div1, null);
-				}
-			} else if (if_block2) {
-				group_outros();
-
-				transition_out(if_block2, 1, 1, () => {
-					if_block2 = null;
-				});
-
-				check_outros();
-			}
 		},
 		i(local) {
 			if (current) return;
 			if (switch_instance) transition_in(switch_instance.$$.fragment, local);
-			transition_in(if_block2);
 			current = true;
 		},
 		o(local) {
 			if (switch_instance) transition_out(switch_instance.$$.fragment, local);
-			transition_out(if_block2);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div1);
 			if_block0.d();
-			/*div0_binding*/ ctx[19](null);
+			/*div0_binding*/ ctx[20](null);
 			if (switch_instance) destroy_component(switch_instance);
 			if (if_block1) if_block1.d();
-			if (if_block2) if_block2.d();
 			mounted = false;
-			dispose();
+			run_all(dispose);
 		}
 	};
 }
 
 function instance($$self, $$props, $$invalidate) {
-	const firebaseConfig = {
-		apiKey: "AIzaSyC_hobr42NEOA46_O-YWYSoXfZgQvTIJa0",
-		authDomain: "tabletalkproj.firebaseapp.com",
-		projectId: "tabletalkproj",
-		storageBucket: "tabletalkproj.appspot.com",
-		messagingSenderId: "550808021827",
-		appId: "1:550808021827:web:88c295a1c72ff68b885df6",
-		measurementId: "G-ER3VK8XS20"
-	};
-
-	const Menus = [TitleScreen, LobbyList];
+	let $auth;
+	let $Screen;
+	let $playerRef;
+	let $player;
+	let $playerAnonStatus;
+	let $playerID;
+	let $db;
+	component_subscribe($$self, auth, $$value => $$invalidate(7, $auth = $$value));
+	component_subscribe($$self, Screen, $$value => $$invalidate(21, $Screen = $$value));
+	component_subscribe($$self, playerRef, $$value => $$invalidate(8, $playerRef = $$value));
+	component_subscribe($$self, player, $$value => $$invalidate(9, $player = $$value));
+	component_subscribe($$self, playerAnonStatus, $$value => $$invalidate(10, $playerAnonStatus = $$value));
+	component_subscribe($$self, playerID, $$value => $$invalidate(22, $playerID = $$value));
+	component_subscribe($$self, db, $$value => $$invalidate(23, $db = $$value));
+	const Menus = [TitleScreen, LobbyList, Lobby];
 	var currentMenu = 0;
 
 	Screen.subscribe(value => {
 		$$invalidate(0, currentMenu = value);
 	});
 
-	const app = initializeApp(firebaseConfig);
-	const database = getDatabase();
 	const google = new GoogleAuthProvider();
-	const auth = getAuth();
-	let player;
-	let playerID;
-	let playerAnonStatus;
-	let playerAvatarURL;
-	let playerRef;
 
-	auth.onAuthStateChanged(user => {
+	$auth.onAuthStateChanged(user => {
 		if (user) {
-			player = user;
-			playerID = user.uid;
-			playerRef = ref(database, "players/" + playerID);
+			player.set(user);
+			playerID.set(user.uid);
+			playerRef.set(ref($db, "players/" + $playerID));
 
 			if (user.isAnonymous == true) {
-				set(playerRef, { name: "Anon" });
-				playerAnonStatus = true;
+				set($playerRef, { name: "Anon" });
+				playerAnonStatus.set(true);
 			} else {
-				get(child(ref(database, "players/"), playerID)).then(snapshot => {
+				get(child(ref($db, "players/"), $playerID)).then(snapshot => {
 					if (!snapshot.child("name").exists()) {
-						set(playerRef, { name: user.displayName });
+						set($playerRef, { name: user.displayName });
 						UserDisplayName.set(user.displayName);
 					}
 				});
 
-				playerAnonStatus = false;
+				playerAnonStatus.set(false);
 			}
 
 			if (playerAvatarURL) {
-				playerAvatarURL = user.photoURL;
+				playerAvatarURL.set(user.photoURL);
 			}
 
-			get(child(playerRef, "name")).then(snapshot => {
+			get(child($playerRef, "name")).then(snapshot => {
 				if (!(snapshot.val() == null)) {
 					UserDisplayName.set(snapshot.val());
 				}
@@ -556,27 +413,17 @@ function instance($$self, $$props, $$invalidate) {
 		}
 	});
 
-	const analytics = getAnalytics(app);
+	// const analytics = getAnalytics(app);
 	let accDropShow = false;
+
 	let stubRef;
 	let accDropRef;
 	let signInBtn;
 	let showSignInModal = false;
-	let showSettingsModal = false;
-	let nameInput;
 
 	function toggleSignInModal() {
 		$$invalidate(5, showSignInModal = !showSignInModal);
 	}
-
-	function toggleSettingsModal() {
-		$$invalidate(6, showSettingsModal = !showSettingsModal);
-		SettingsModal.set(showSettingsModal);
-	}
-
-	SettingsModal.subscribe(value => {
-		$$invalidate(6, showSettingsModal = value);
-	});
 
 	const toggleAccDrop = () => {
 		accState: {
@@ -594,12 +441,16 @@ function instance($$self, $$props, $$invalidate) {
 	};
 
 	const logout = () => {
-		if (playerAnonStatus) {
-			deleteUser(player);
-			remove(playerRef);
+		if ($playerAnonStatus) {
+			deleteUser($player);
+			remove($playerRef);
 		}
 
-		signOut(auth).then(() => {
+		if ($Screen != 0) {
+			Screen.set(0);
+		}
+
+		signOut($auth).then(() => {
 			UserDisplayName.set("");
 		}).catch(error => {
 			console.log(error);
@@ -607,12 +458,12 @@ function instance($$self, $$props, $$invalidate) {
 	};
 
 	const loginAnon = () => {
-		signInAnonymously(auth);
+		signInAnonymously($auth);
 		toggleSignInModal();
 	};
 
 	const loginGoogle = () => {
-		signInWithPopup(auth, google).then(result => {
+		signInWithPopup($auth, google).then(result => {
 			// This gives you a Google Access Token. You can use it to access the Google API.
 			const credential = GoogleAuthProvider.credentialFromResult(result);
 
@@ -636,16 +487,24 @@ function instance($$self, $$props, $$invalidate) {
 		toggleSignInModal();
 	};
 
-	function changeName(name) {
-		set(playerRef, { name });
-		UserDisplayName.set(name);
-	}
-
 	var username = "";
 
 	UserDisplayName.subscribe(value => {
-		$$invalidate(8, username = value);
+		$$invalidate(6, username = value);
 	});
+
+	const beforeunload_handler = () => {
+		if ($playerAnonStatus) {
+			deleteUser($player);
+			remove($playerRef);
+
+			signOut($auth).then(() => {
+				UserDisplayName.set("");
+			}).catch(error => {
+				console.log(error);
+			});
+		}
+	};
 
 	function div_binding($$value) {
 		binding_callbacks[$$value ? 'unshift' : 'push'](() => {
@@ -668,15 +527,6 @@ function instance($$self, $$props, $$invalidate) {
 		});
 	}
 
-	function input_input_handler() {
-		nameInput = this.value;
-		$$invalidate(7, nameInput);
-	}
-
-	const click_handler = () => {
-		changeName(nameInput);
-	};
-
 	return [
 		currentMenu,
 		accDropShow,
@@ -684,29 +534,28 @@ function instance($$self, $$props, $$invalidate) {
 		accDropRef,
 		signInBtn,
 		showSignInModal,
-		showSettingsModal,
-		nameInput,
 		username,
+		$auth,
+		$playerRef,
+		$player,
+		$playerAnonStatus,
 		Menus,
 		toggleSignInModal,
-		toggleSettingsModal,
 		toggleAccDrop,
 		logout,
 		loginAnon,
 		loginGoogle,
-		changeName,
+		beforeunload_handler,
 		div_binding,
 		button_binding,
-		div0_binding,
-		input_input_handler,
-		click_handler
+		div0_binding
 	];
 }
 
 class App extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, {}, null, [-1, -1]);
+		init(this, options, instance, create_fragment, safe_not_equal, {});
 	}
 }
 
