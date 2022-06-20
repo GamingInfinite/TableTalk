@@ -62,3 +62,17 @@ export class Deck {
     this.deck = randDeck;
   }
 }
+
+export class Hand {
+  hand: Card[];
+
+  getTop(): Card {
+    let top = this.hand[0];
+    this.hand.shift();
+    return top;
+  }
+
+  add(adds: Array<Card>) {
+    this.hand = this.hand.concat(adds);
+  }
+}
