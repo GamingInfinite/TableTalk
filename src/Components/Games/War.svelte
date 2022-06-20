@@ -91,7 +91,7 @@
     addToBottom(cards: Array<Card>){
       for(let card in cards){
         this.cards.push(card);
-      }8
+      }
     }
   }
 
@@ -176,6 +176,11 @@
           temp.push(tableCards[i][1]);
         }
         this.players[biggest.player].addToBottom(temp);
+      } else {
+        this.pot
+        for(let player in this.table){
+          
+        }
       }
       // add code for 'wars'
 
