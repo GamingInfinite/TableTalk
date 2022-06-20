@@ -87,6 +87,12 @@
       this.cards.shift();
       return top;
     }
+
+    addToBottom(cards: Array<Card>){
+      for(let card in cards){
+        this.cards.push(card);
+      }8
+    }
   }
 
   class Hand extends Deck {
@@ -110,27 +116,70 @@
   }
 
   class War {
-    players: Hand[];
+    players: Map<string, Hand>;
     deck: Deck;
+    table: Map<string, Card>;
+    num_players: number;
+    pot: Deck;
 
     constructor(players: Array<string>) {
+      this.pot = new Deck();
+
       this.deck = new Deck();
       this.deck.fullDeck();
-      this.players = [];
+
+      this.table = new Map<string, Card>;
+      this.players = new Map<string, Hand>;
+      this.num_players = players.length;
+
       for (let i = 0; i < players.length; i++) {
-        this.players.push(new Hand(players[i], false));
+        this.players.set(players[i], new Hand(players[i], false));
+        this.table.set(players[i], new Card());
       }
     }
 
     deal(): void{
-      var p = 0;
+      const ids = Object.keys(this.players);
+      let p = 0;
       while(this.deck.cards.length > 0){
-        this.players[p].addCards(1, false, this.deck.getTop());
+        this.players[ids[p]].addCards(1, false, this.deck.getTop());
         p++;
-        if (p >= this.players.length){
+        if (p >= this.num_players){
           p = 0;
         }
       }
+    }
+    
+    playRound(): void{
+      for(let player in this.players){
+        this.table[player] = this.players[player].getTop();
+      }
+
+      let war = false;
+      let biggest = {
+        "player": "none",
+        "value": 0
+      };
+      for(let player in this.table){
+        if(this.table[player].value > biggest.value){
+          biggest.value = this.table[player].value;
+          biggest.player = player;
+        } else if(this.table[player].value == biggest.value){
+          war = true;
+        }
+      }
+
+      if(!war){
+        let tableCards = Object.entries(this.table);
+        let temp = [];
+        for(var i=0; i<tableCards.length; i++){
+          temp.push(tableCards[i][1]);
+        }
+        this.players[biggest.player].addToBottom(temp);
+      }
+      // add code for 'wars'
+
+      console.log(biggest.player)
     }
   }
 </script>
