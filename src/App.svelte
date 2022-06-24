@@ -177,7 +177,7 @@
       </div>
     {:else}
       <button
-        class="bg-indigo-700 text-white active:bg-indigo-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+        class="btn btn-primary"
         bind:this={signInBtn}
         on:click={toggleSignInModal}
       >
@@ -259,7 +259,6 @@
   @tailwind utilities;
 
   .screen {
-    background-color: rgb(12, 171, 199);
     height: 100vh;
     text-align: center;
     font-weight: 900;

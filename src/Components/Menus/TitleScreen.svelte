@@ -35,7 +35,7 @@
 <div class="title">TableTalk</div>
 <div class="buttons">
   <button
-    class="bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+    class="btn btn-accent"
     class:disabled={username == ""}
     on:click={() => {
       Screen.set(1);
@@ -44,7 +44,7 @@
     Play
   </button>
   <button
-    class="bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+    class="btn btn-secondary"
     class:disabled={username == ""}
     on:click={toggleSettingsModal}
   >
