@@ -2534,10 +2534,10 @@ var Server = class {
 // .svelte-kit/cloudflare-tmp/manifest.js
 var manifest = {
   appDir: "_app",
-  assets: /* @__PURE__ */ new Set([".nojekyll", "favicon.png"]),
+  assets: /* @__PURE__ */ new Set(["favicon.png"]),
   mimeTypes: { ".png": "image/png" },
   _: {
-    entry: { "file": "start-5be0cdee.js", "js": ["start-5be0cdee.js", "chunks/index-54ae59b6.js"], "css": [] },
+    entry: { "file": "start-22f2faaa.js", "js": ["start-22f2faaa.js", "chunks/index-54ae59b6.js"], "css": [] },
     nodes: [
       () => Promise.resolve().then(() => (init__(), __exports)),
       () => Promise.resolve().then(() => (init__2(), __exports2)),

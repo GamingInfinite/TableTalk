@@ -507,7 +507,7 @@
     estree-walker "^2.0.1"
     picomatch "^2.2.2"
 
-"@sveltejs/adapter-auto@^1.0.0-next.52":
+"@sveltejs/adapter-auto@next":
   version "1.0.0-next.52"
   resolved "https://registry.yarnpkg.com/@sveltejs/adapter-auto/-/adapter-auto-1.0.0-next.52.tgz#6894ff081efc6d7844ad05a818ba11d45a146935"
   integrity sha512-jOuC7RauiwGg7BQQEZxBGcwtwynNqQSuGJ7MJ9kk5WIrFCMrZSclwnpO1yLmUUYFKvJ61Z7bvVoDqm6+CgLEaw==
@@ -516,7 +516,7 @@
     "@sveltejs/adapter-netlify" "1.0.0-next.65"
     "@sveltejs/adapter-vercel" "1.0.0-next.59"
 
-"@sveltejs/adapter-cloudflare@1.0.0-next.23", "@sveltejs/adapter-cloudflare@^1.0.0-next.23":
+"@sveltejs/adapter-cloudflare@1.0.0-next.23", "@sveltejs/adapter-cloudflare@next":
   version "1.0.0-next.23"
   resolved "https://registry.yarnpkg.com/@sveltejs/adapter-cloudflare/-/adapter-cloudflare-1.0.0-next.23.tgz#eb65b64199c7451b3e8dcab9abbfb6382b56d361"
   integrity sha512-WaDE25Ib3Q9kM1BBxvGxr57vfExg0Q1Wu2H3dSFV4Apw18UHKS89P/U6wd4u4zAzAw+Mcm8gduX/rRs5z0YMwA==
@@ -532,13 +532,6 @@
     "@iarna/toml" "^2.2.5"
     esbuild "^0.14.42"
     set-cookie-parser "^2.4.8"
-    tiny-glob "^0.2.9"
-
-"@sveltejs/adapter-static@next":
-  version "1.0.0-next.34"
-  resolved "https://registry.yarnpkg.com/@sveltejs/adapter-static/-/adapter-static-1.0.0-next.34.tgz#f17e967e43f73e57feed6d81d8151de1e09d9836"
-  integrity sha512-XjuMhemme5z0L/B2nTZpA6k+RJjF+b6L96ts6gIQ6ixiCzJQSbBqJhrrBYBCaeLAKvdUMoGEmX8m862JhKjRFg==
-  dependencies:
     tiny-glob "^0.2.9"
 
 "@sveltejs/adapter-vercel@1.0.0-next.59":
