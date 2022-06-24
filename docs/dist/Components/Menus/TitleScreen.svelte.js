@@ -177,9 +177,9 @@ function create_fragment(ctx) {
 			t5 = space();
 			if (if_block) if_block.c();
 			attr(div0, "class", "title svelte-1lsurz4");
-			attr(button0, "class", "bg-emerald-400 text-white active:bg-emerald-500 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 svelte-1lsurz4");
+			attr(button0, "class", "btn btn-accent svelte-1lsurz4");
 			toggle_class(button0, "disabled", /*username*/ ctx[0] == "");
-			attr(button1, "class", "bg-cyan-300 text-white active:bg-cyan-400 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 svelte-1lsurz4");
+			attr(button1, "class", "btn btn-secondary svelte-1lsurz4");
 			toggle_class(button1, "disabled", /*username*/ ctx[0] == "");
 			attr(div1, "class", "buttons");
 		},

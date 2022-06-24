@@ -64,7 +64,7 @@ function create_else_block(ctx) {
 		c() {
 			button = element("button");
 			button.textContent = "Sign In";
-			attr(button, "class", "bg-indigo-700 text-white active:bg-indigo-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150");
+			attr(button, "class", "btn btn-primary");
 		},
 		m(target, anchor) {
 			insert(target, button, anchor);
@@ -259,8 +259,8 @@ function create_fragment(ctx) {
 			t1 = space();
 			if (if_block1) if_block1.c();
 			attr(div0, "id", "userStub");
-			attr(div0, "class", "svelte-qw6djw");
-			attr(div1, "class", "screen svelte-qw6djw");
+			attr(div0, "class", "svelte-wr9684");
+			attr(div1, "class", "screen svelte-wr9684");
 		},
 		m(target, anchor) {
 			insert(target, div1, anchor);
