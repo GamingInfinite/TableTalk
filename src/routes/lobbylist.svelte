@@ -12,19 +12,6 @@
 
   import { onMount } from "svelte";
 
-  import { library } from "@fortawesome/fontawesome-svg-core";
-  import {
-    faArrowsRotate as refresh,
-    faX as exit,
-    faPlus as add,
-    faHardOfHearing,
-  } from "@fortawesome/free-solid-svg-icons";
-  import {
-    FontAwesomeIcon,
-    FontAwesomeLayers,
-    FontAwesomeLayersText,
-  } from "fontawesome-svelte";
-
   let lobbyname: string = $UserDisplayName + "'s Lobby";
   let lobbypass: string = "";
   let lobbyList: lobbyData[] = [];
@@ -106,25 +93,14 @@
       window.location.href = "/";
     }
   });
-
-  library.add(refresh);
-  library.add(exit);
-  library.add(add);
 </script>
 
 <div class="btn-group flex flex-nowrap absolute ml-10 mt-20 sm:mt-10">
   <button class="btn btn-error p-0 w-1/4">
-    <a href="/" class="flex w-full h-full justify-center items-center">
-      <FontAwesomeIcon icon={exit} />
-    </a>
+    <a href="/" class="flex w-full h-full justify-center items-center">✕</a>
   </button>
-  <label for="newLobbyModal" class="btn rounded-none gap-2">
-    <FontAwesomeIcon icon={add} />
-    New Lobby
-  </label>
-  <button class="btn btn-accent" on:click={refreshLobbies}>
-    <FontAwesomeIcon icon={refresh} />
-  </button>
+  <label for="newLobbyModal" class="btn rounded-none gap-2">+ New Lobby</label>
+  <button class="btn btn-accent" on:click={refreshLobbies}>Refresh</button>
 </div>
 <div
   class="flex absolute justify-center text-xl flex-wrap mt-40 sm:mt-20 w-screen"
@@ -186,8 +162,7 @@
           href="/lobby"
           class="flex w-full h-full justify-center gap-2 px-4 items-center"
         >
-          <FontAwesomeIcon icon={add} />
-          Create Lobby
+          + Create Lobby
         </a>
       </button>
     </div>

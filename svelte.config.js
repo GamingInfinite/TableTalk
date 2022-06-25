@@ -1,4 +1,4 @@
-import adapter from "@sveltejs/adapter-cloudflare";
+import adapter from "svelte-adapter-firebase";
 import preprocess from "svelte-preprocess";
 
 const dev = "production" === "development";

@@ -1,20 +1,9 @@
 <script lang="ts">
   import { UserDisplayName, lobbyRef } from "../stores";
 
-  import {child} from "firebase/database"
+  import { child } from "firebase/database";
 
   import { onMount } from "svelte";
-
-  import {
-    faArrowsRotate as refresh,
-    faX as exit,
-    faPlus as add,
-  } from "@fortawesome/free-solid-svg-icons";
-  import {
-    FontAwesomeIcon,
-    FontAwesomeLayers,
-    FontAwesomeLayersText,
-  } from "fontawesome-svelte";
 
   let players: PlayerData[] = [];
 
@@ -36,7 +25,7 @@
 <div class="btn-group flex flex-nowrap absolute ml-10 mt-10">
   <button class="btn btn-error">
     <a href="/lobbylist" class="flex w-full h-full justify-center items-center">
-      <FontAwesomeIcon icon={exit} />
+      ✕
     </a>
   </button>
 </div>

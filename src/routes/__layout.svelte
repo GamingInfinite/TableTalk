@@ -18,18 +18,9 @@
     signInAnonymously,
     signOut,
     deleteUser,
-	signInWithEmailAndPassword
+    signInWithEmailAndPassword,
   } from "firebase/auth";
   import { ref, set, get, remove, child } from "firebase/database";
-
-  import { library } from "@fortawesome/fontawesome-svg-core";
-  import { faGoogle as fasGoogle } from "@fortawesome/free-brands-svg-icons";
-  import { faUser as fasUser } from "@fortawesome/free-solid-svg-icons";
-  import {
-    FontAwesomeIcon,
-    FontAwesomeLayers,
-    FontAwesomeLayersText,
-  } from "fontawesome-svelte";
 
   const google: GoogleAuthProvider = new GoogleAuthProvider();
 
@@ -109,10 +100,7 @@
   var username = "";
   UserDisplayName.subscribe((value) => {
     username = value;
-  });
-
-  library.add(fasGoogle);
-  library.add(fasUser);
+  })
 </script>
 
 <div class="absolute right-0 top-0 mr-8 mt-8">
@@ -140,11 +128,9 @@
           ✕
         </label>
         <button class="btn btn-ghost gap-2" on:click={loginGoogle}>
-          <FontAwesomeIcon icon={fasGoogle} />
           Sign-in with Google
         </button>
         <button class="btn btn-ghost gap-2" on:click={loginAnon}>
-          <FontAwesomeIcon icon={fasUser} />
           Sign-in Anonymously
         </button>
       </label>
