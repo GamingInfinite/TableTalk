@@ -21,6 +21,11 @@
   let iamhost = false;
 
   let players: PlayerData[] = [];
+  let settings: Settings = {
+    game: "War",
+    maxPlayersEnabled: false,
+    maxPlayers: 10,
+  };
 
   let playersRef: DatabaseReference;
 
@@ -45,9 +50,10 @@
     refreshPlayerList();
   });
 
-  let closeButton;
+  let closeButton: HTMLAnchorElement;
   function closeRoom() {
     remove($lobbyRef);
+    closeButton.click();
   }
 
   let leaveButton: HTMLAnchorElement;
@@ -91,6 +97,14 @@
       });
   }
 
+  function refreshSettings() {}
+
+  interface Settings {
+    game: string;
+    maxPlayersEnabled: boolean;
+    maxPlayers: number;
+  }
+
   interface PlayerData {
     id: string;
     name: string;
@@ -123,13 +137,13 @@
   <div class="flex flex-col w-2/3" />
   <div class="flex flex-col w-1/4">
     <div class="flex flex-row h-36" />
-    <div class="flex flex-row bg-base-300 justify-center rounded-t-lg">
+    <div class="flex flex-row bg-base-300 justify-center py-2 rounded-t-lg">
       Player List
     </div>
-    <div class="flex flex-row bg-base-200 justify-center rounded-b-lg">
+    <div class="flex flex-row bg-base-200 justify-center py-4">
       <div class="flex flex-col">
         {#each players as player (player.id)}
-          <div class="flex flex-row justify-center items-center gap-2">
+          <div class="flex flex-row justify-center items-center gap-2 mb-2">
             {player.name}
             {#if player.host}
               <svg
@@ -148,7 +162,22 @@
         {/each}
       </div>
     </div>
-    <div class="flex flex-row mt-4 justify-center">
+    <div class="flex flex-row bg-base-300 justify-center py-2">
+      Lobby Settings
+    </div>
+    <div class="flex flex-row bg-base-200 justify-center py-4 rounded-b-lg">
+      <div class="flex flex-col">
+        <div class="flex flex-row justify-center">Game: {settings.game}</div>
+        <div class="flex flex-row justify-center">
+          {#if settings.maxPlayersEnabled}
+            Max Players: {settings.maxPlayers}
+          {:else}
+            No Maximum Player Count
+          {/if}
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-row mt-4 justify-around">
       <button
         class="btn btn-primary p-0"
         class:btn-disabled={!iamhost}
@@ -162,6 +191,52 @@
           Close Room
         </a>
       </button>
+      <label
+        for="lobbySettings"
+        class="btn btn-secondary"
+        class:btn-disabled={!iamhost}
+      >
+        Settings
+      </label>
+      <input type="checkbox" id="lobbySettings" class="modal-toggle" />
+      <label for="lobbySettings" class="modal cursor-pointer">
+        <label class="modal-box relative" for="">
+          <label
+            for="lobbySettings"
+            class="btn btn-sm btn-circle absolute right-2 top-2"
+          >
+            ✕
+          </label>
+          <div class="flex flex-col">
+            <div class="flex flex-row justify-center my-6">
+              <div class="flex flex-col">
+                <div class="form-control">
+                  <label class="label cursor-pointer gap-2">
+                    <span class="label-text">Max Players</span>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary"
+                      bind:checked={settings.maxPlayersEnabled}
+                    />
+                  </label>
+                </div>
+              </div>
+              <div class="flex flex-col ml-2">
+                <input
+                  type="text"
+                  placeholder={String(settings.maxPlayers)}
+                  class="input input-bordered w-full max-w-xs"
+                  bind:value={settings.maxPlayers}
+                  disabled={!settings.maxPlayersEnabled}
+                />
+              </div>
+            </div>
+            <div class="flex flex-row justify-center">
+              <button class="btn btn-accent">Apply Settings</button>
+            </div>
+          </div>
+        </label>
+      </label>
     </div>
   </div>
 </div>
