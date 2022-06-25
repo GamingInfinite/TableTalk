@@ -5,11 +5,11 @@ export const manifest = {
 	_: {
 		entry: {"file":"start-b69d8908.js","js":["start-b69d8908.js","chunks/index-45f71731.js","chunks/index-65a915e8.js"],"css":[]},
 		nodes: [
-			() => import('./nodes/0.js'),
-			() => import('./nodes/1.js'),
-			() => import('./nodes/2.js'),
-			() => import('./nodes/3.js'),
-			() => import('./nodes/4.js')
+			() => import('../output/server/nodes/0.js'),
+			() => import('../output/server/nodes/1.js'),
+			() => import('../output/server/nodes/2.js'),
+			() => import('../output/server/nodes/3.js'),
+			() => import('../output/server/nodes/4.js')
 		],
 		routes: [
 			{
