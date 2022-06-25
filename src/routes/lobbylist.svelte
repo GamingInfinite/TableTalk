@@ -8,13 +8,17 @@
     playerID,
   } from "../stores";
 
-  import { get, ref, push, set, child } from "firebase/database";
+  import { get, ref, push, set, child, DataSnapshot } from "firebase/database";
 
   import { onMount } from "svelte";
 
   let lobbyname: string = $UserDisplayName + "'s Lobby";
   let lobbypass: string = "";
   let lobbyList: lobbyData[] = [];
+
+  let queueJoin;
+
+  lobbiesRef.set(ref($db, "lobbies/"));
 
   function createLobby() {
     lobbiesRef.set(push(ref($db, "lobbies/")));
@@ -32,13 +36,12 @@
     });
   }
 
-  function joinLobby(id: string) {
-    lobbiesRef.set(ref($db, "lobbies/"));
+  function joinLobby(id: string, host: boolean = false) {
     lobbyRef.set(child($lobbiesRef, id));
     lobbyPlayerRef.set(child($lobbyRef, "players/" + $playerID));
     set($lobbyPlayerRef, {
       name: $UserDisplayName,
-      host: false,
+      host: host,
     });
   }
 
@@ -58,7 +61,24 @@
           const element = lobbyKeys[i];
           let lobbyName = lobbyJson[element].name;
           lobbyNames.push(lobbyName);
-          let playerCount = Object.keys(lobbyJson[element].players).length;
+          let playerCount = 0;
+          if (lobbyJson[element].players) {
+            playerCount = Object.keys(lobbyJson[element].players).length;
+            let players = Object.keys(lobbyJson[element].players);
+            if (players.includes($playerID)) {
+              let host: any;
+              get(
+                child(
+                  $lobbiesRef,
+                  lobbyKeys[i] + "/players/" + players[i] + "/host"
+                )
+              ).then((snapshot) => {
+                host = snapshot.val();
+                joinLobby(lobbyKeys[i], host);
+                queueJoin = lobbyKeys[i];
+              });
+            }
+          }
           playerCounts.push(playerCount);
           let password = lobbyJson[element].pass;
           passwords.push(password);
@@ -77,6 +97,10 @@
         console.log("No Lobbies");
         console.log(error);
       });
+    if (queueJoin) {
+      console.log(queueJoin);
+      document.getElementById(queueJoin).click();
+    }
   }
 
   interface lobbyData {
@@ -149,7 +173,11 @@
         joinLobby(lobby.id);
       }}
     >
-      <a href="/lobby" class="flex h-full w-full justify-around items-center">
+      <a
+        href="/lobby"
+        id={lobby.id}
+        class="flex h-full w-full justify-around items-center"
+      >
         <div>
           {lobby.name}
         </div>

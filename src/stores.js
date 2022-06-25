@@ -35,3 +35,4 @@ export const playerRef = writable();
 export const lobbiesRef = writable();
 export const lobbyRef = writable();
 export const lobbyPlayerRef = writable();
+export const lobbyPlayerList = writable();
