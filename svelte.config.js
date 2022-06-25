@@ -1,4 +1,4 @@
-import adapter from "svelte-adapter-firebase";
+import adapter from "@sveltejs/adapter-netlify";
 import preprocess from "svelte-preprocess";
 
 const dev = "production" === "development";

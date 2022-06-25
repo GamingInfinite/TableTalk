@@ -1,15 +1,17 @@
-export const manifest = {
+const { init } = require('../serverless.js');
+
+exports.handler = init({
 	appDir: "_app",
 	assets: new Set(["favicon.png"]),
 	mimeTypes: {".png":"image/png"},
 	_: {
 		entry: {"file":"start-2b4a0f46.js","js":["start-2b4a0f46.js","chunks/index-45f71731.js","chunks/index-65a915e8.js"],"css":[]},
 		nodes: [
-			() => import('./nodes/0.js'),
-			() => import('./nodes/1.js'),
-			() => import('./nodes/2.js'),
-			() => import('./nodes/3.js'),
-			() => import('./nodes/4.js')
+			() => Promise.resolve().then(() => require('../server/nodes/0.js')),
+			() => Promise.resolve().then(() => require('../server/nodes/1.js')),
+			() => Promise.resolve().then(() => require('../server/nodes/2.js')),
+			() => Promise.resolve().then(() => require('../server/nodes/3.js')),
+			() => Promise.resolve().then(() => require('../server/nodes/4.js'))
 		],
 		routes: [
 			{
@@ -51,4 +53,4 @@ export const manifest = {
 			return {  };
 		}
 	}
-};
+});
