@@ -2,6 +2,6 @@ import * as module from '../entries/pages/lobbylist.svelte.js';
 
 export { module };
 export const index = 4;
-export const entry = 'pages/lobbylist.svelte-9d77d7ef.js';
-export const js = ["pages/lobbylist.svelte-9d77d7ef.js","chunks/index-45f71731.js","chunks/stores-57d30480.js","chunks/index-65a915e8.js"];
+export const entry = 'pages/lobbylist.svelte-7a259c09.js';
+export const js = ["pages/lobbylist.svelte-7a259c09.js","chunks/index-51dc6ce2.js","chunks/stores-72b0dafd.js","chunks/index-a8a2b196.js"];
 export const css = [];
