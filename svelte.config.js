@@ -1,8 +1,10 @@
 import adapter from "@sveltejs/adapter-cloudflare";
+import preprocess from "svelte-preprocess";
 
 const dev = "production" === "development";
 
 const config = {
+  preprocess: preprocess(),
   kit: {
     adapter: adapter(),
     methodOverride: {
