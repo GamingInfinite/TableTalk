@@ -1,192 +1,253 @@
 <script lang="ts">
-  //lol
-  var SUITS = {
-    SPADES: "Spades",
-    HEARTS: "Hearts",
-    CLUBS: "Clubs",
-    DIAMONDS: "Diamonds",
-    JOKER: "Joker",
-  };
+  // BEFORE THIS IS USED, REMOVE TESTING codePointAt
+//  |
+//  |
+//  V
 
-  class Card {
-    suit: string;
-    value: number;
+class Card{
+	constructor(suit="null", value=-1){
+		this.suit = suit;
+		this.value = value;
+	}
+}
+	
+class Player{
+	constructor(ID){
+		this.ID = ID;
+		this.hand = [];
+		this.playSpot = new Card();
+		this.died = 0;
+	}
+	
+	getTop(){
+		return this.hand.pop(0);
+	}
+	
+	playTop(){
+		if (this.playSpot.suit == "null"){
+			this.playSpot = this.getTop();
+			console.log(this.ID," played ",this.playSpot);
+		} else {
+			console.log(this.ID," kept thier current card, ",this.playSpot);
+		}
+	}
+	
+	addToBottom(cards){
+		if (cards instanceof Card){
+			this.hand.push(cards);
+		}else{
+			this.hand = cards.concat(this.hand);
+		}
+		console.log(this.ID, " got ", cards);
+	}
+}
 
-    constructor(suit: string = "Null", value: number = -1) {
-      this.suit = suit;
-      this.value = value;
-    }
-  }
+class Table{
+	constructor(player_IDs){
+		this.players = [];
+		for (var i = 0; i < player_IDs.length; i++) {
+			this.players.push(new Player(player_IDs[i]));
+		}
+		this.pot = [];
+		this.highest = {"ID": null,
+						"value": 0};
+		this.ties = [];
+	}
+	
+	deal(){
+		//Full Deck Code
+		const deck = [];
+		for (let i = 1; i <= 13; i++) {
+			deck.push(new Card("Hearts", i));
+			deck.push(new Card("Diamonds", i));
+			deck.push(new Card("Spades", i));
+			deck.push(new Card("Clubs", i));
+		}
+		
+		//Shuffle
+		
+		let currentIndex = 52,
+			randomIndex;
 
-  class Deck {
-    cards: Card[];
+		while (currentIndex != 0) {
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
 
-    constructor(size: number = 0, joker: boolean = false) {
-      this.cards = [];
-      this.addCards(size, joker);
-    }
+			[deck[currentIndex], deck[randomIndex]] = [
+			  deck[randomIndex],
+			  deck[currentIndex],
+			];
+		}
+		
+		//Deal to Players
+		var p = 0;
+		while(deck.length > 0){
+			this.players[p].addToBottom(deck.pop(0));
+			p++;
+			if (p >= this.players.length){
+				p = 0;
+			}
+		}	
+	}
+	
+	placeCard(){
+		// only play card if you have one (duh)
+		for(var i=0;i<this.players.length;i++){
+			if (this.players[i].hand.length != 0){
+				this.players[i].playTop();
+				this.players[i].died++;
+			}
+		}
+	}
+	
+	record(){
+		// reset highest and ties
+		this.highest = {"ID": null,
+						"value": 0};
+		this.ties = [];
+		
+		for(var i=0;i<this.players.length;i++){
+			// standard find highest algorithim, but if a tie occurs (and the playspot
+			// isn't null) then both parties are added to the tie list
+			if (this.players[i].playSpot.value > this.highest["value"]){
+				this.highest["value"] = this.players[i].playSpot.value;
+				this.highest["ID"] = this.players[i].ID;
+			} else if (this.players[i].playSpot.suit != "null" && (this.players[i].playSpot.value == this.highest["value"])){
+				this.ties.push(this.players[i].ID);
+				// prevent leader from benig added to ties multiple times
+				if(!this.ties.includes(this.highest["ID"])){
+					this.ties.push(this.highest["ID"]);					
+				}
+			}
+		}
+		if (this.hasTie()){
+			console.log("There is a tie between: ", this.ties);
+		} else {
+			console.log(this.highest, " won");
+		}
+	}
+	
+	pushPot(){
+		for(var i=0;i<this.players.length;i++){
+			// check if player has a card in the playspot
+			if (this.players[i].playSpot.suit != "null"){
+				// player keeps their card on the table if there is an active tie
+				// and they have no more cards
+				if (!this.hasTie() || this.players[i].hand.length != 0){
+					this.pot.push(this.players[i].playSpot);
+					this.players[i].playSpot = new Card();
+				} else {
+					console.log(this.players[i].ID, " kept their card!");
+				}
+			}
+		}
+		console.log("The Pot Contains: ", this.pot);
+	}
+	
+	hasTie(){
+		return this.ties.length != 0;
+	}
+	
+	reward(ID){
+		for(var i=0;i<this.players.length;i++){
+			// check if player is the one being rewarded
+			if (this.players[i].ID == ID){
+				this.players[i].addToBottom(this.pot);
+				this.pot = [];
+				break;
+			}
+		}
+		console.log(ID, " was given the pot");
+	}
+	
+	war(){
+		// fancy stuff to make text red
+		console.log( this.ties,"\x1b[31m", " are in a war!","\x1b[0m");
+		
+		// add buffer to pot
+		var temp;
+		for(var i=0;i<this.players.length;i++){
+			// only select players who are actually tied
+			if (this.ties.includes(this.players[i].ID)){
+				// players normaly play 3 cards, but if they have less
+				// than that then phantom cards are added and the whole 
+				// thing crashes :(
+				if (this.players[i].hand.length <= 3){
+					temp = [];
+					for(var j=0;j<this.players[i].hand.length-1;j++){
+						temp.push(this.players[i].getTop());
+					}
+					this.pot = this.pot.concat(temp);
+					console.log(this.players[i].ID, "sacrificed ", temp);
+				} else {
+					temp = [];
+					for(var j=0;j<3;j++){
+						temp.push(this.players[i].getTop());
+					}
+					this.pot = this.pot.concat(temp);
+					console.log(this.players[i].ID, "sacrificed ", temp);
+				}
+			}
+		}
+		
+		// Only ties players try again
+		for(var i=0;i<this.players.length;i++){
+			if (this.ties.includes(this.players[i].ID)){
+				this.players[i].playTop();
+			}
+		} 
+		this.tie = [];
+		console.log("\x1b[31m", "END WAR!","\x1b[0m");
+	}
+	
+	displayTotals(){
+		var result = "";
+		for(var i=0;i<this.players.length;i++){
+			result += this.players[i].ID;
+			result += ": "+(this.players[i].hand.length).toString();
+			result += " cards\n";
+		}
+		return result;
+	}
+}
 
-    addCards(
-      amount: number = 1,
-      joker: boolean = false,
-      card: Card = new Card()
-    ) {
-      if (card.suit == "Null") {
-        if (joker) {
-          var suits = 5;
-        } else {
-          var suits = 4;
-        }
-        for (var i = 0; i < amount; i++) {
-          this.cards.push(
-            new Card(
-              Object.values(SUITS)[Math.floor(Math.random() * suits)],
-              Math.floor(Math.random() * 13)
-            )
-          );
-        }
-      } else {
-        for (var i = 0; i < amount; i++) {
-          this.cards.push(card);
-        }
-      }
-    }
+//'main' function
+var NUM_PLAYERS = 4;
 
-    // Knuth Shuffle
-    shuffle(): void {
-      let currentIndex = this.cards.length,
-        randomIndex;
+var board = new Table(["p1", "p2", "p3", "p4", "p5", "p6"]);
+board.deal();
+console.log(board.displayTotals());
 
-      while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
+function checkWin(table){
+	var empty = 0;
+	for(var i = 0; i<table.players.length; i++){
+		if (table.players[i].hand.length == 0){
+			empty ++;
+		}
+	}
+	return empty < table.players.length-1;
+}
 
-        [this.cards[currentIndex], this.cards[randomIndex]] = [
-          this.cards[randomIndex],
-          this.cards[currentIndex],
-        ];
-      }
-    }
-
-    fullDeck(jokers: boolean = false): void {
-      this.cards = [];
-      for (let i = 1; i <= 13; i++) {
-        this.cards.push(new Card(SUITS.HEARTS, i));
-        this.cards.push(new Card(SUITS.DIAMONDS, i));
-        this.cards.push(new Card(SUITS.SPADES, i));
-        this.cards.push(new Card(SUITS.CLUBS, i));
-      }
-      if (jokers) {
-        this.cards.push(new Card(SUITS.JOKER, 0));
-        this.cards.push(new Card(SUITS.JOKER, 0));
-      }
-    }
-
-    getTop(): Card {
-      var top = this.cards[0];
-      this.cards.shift();
-      return top;
-    }
-
-    addToBottom(cards: Array<Card>){
-      for(let card in cards){
-        this.cards.push(card);
-      }
-    }
-  }
-
-  class Hand extends Deck {
-    visible: boolean;
-    player: string;
-
-    constructor(
-      player: string,
-      visible: boolean,
-      size: number = 0,
-      joker: boolean = false
-    ) {
-      super(size, joker);
-      this.visible = visible;
-      this.player = player;
-    }
-
-    addBottom(adds: Array<Card>): void {
-      this.cards = this.cards.concat(adds);
-    }
-  }
-
-  class War {
-    players: Map<string, Hand>;
-    deck: Deck;
-    table: Map<string, Card>;
-    num_players: number;
-    pot: Deck;
-
-    constructor(players: Array<string>) {
-      this.pot = new Deck();
-
-      this.deck = new Deck();
-      this.deck.fullDeck();
-
-      this.table = new Map<string, Card>;
-      this.players = new Map<string, Hand>;
-      this.num_players = players.length;
-
-      for (let i = 0; i < players.length; i++) {
-        this.players.set(players[i], new Hand(players[i], false));
-        this.table.set(players[i], new Card());
-      }
-    }
-
-    deal(): void{
-      const ids = Object.keys(this.players);
-      let p = 0;
-      while(this.deck.cards.length > 0){
-        this.players[ids[p]].addCards(1, false, this.deck.getTop());
-        p++;
-        if (p >= this.num_players){
-          p = 0;
-        }
-      }
-    }
-    
-    playRound(): void{
-      for(let player in this.players){
-        this.table[player] = this.players[player].getTop();
-      }
-
-      let war = false;
-      let biggest = {
-        "player": "none",
-        "value": 0
-      };
-      for(let player in this.table){
-        if(this.table[player].value > biggest.value){
-          biggest.value = this.table[player].value;
-          biggest.player = player;
-        } else if(this.table[player].value == biggest.value){
-          war = true;
-        }
-      }
-
-      if(!war){
-        let tableCards = Object.entries(this.table);
-        let temp = [];
-        for(var i=0; i<tableCards.length; i++){
-          temp.push(tableCards[i][1]);
-        }
-        this.players[biggest.player].addToBottom(temp);
-      } else {
-        this.pot
-        for(let player in this.table){
-          
-        }
-      }
-      // add code for 'wars'
-
-      console.log(biggest.player)
-    }
-  }
+var round = 0;
+console.log("START");
+while (checkWin(board)){
+	console.log("Round: ", ++round);
+	board.placeCard();
+	board.record();
+	board.pushPot();
+	while (board.hasTie()){
+		board.war();
+		board.record();
+		board.pushPot();
+	}
+	board.reward(board.highest["ID"]);
+	console.log(board.displayTotals());
+}
+console.log(board.highest["ID"], " won after ", round, " rounds.");
+for(var i=0;i<board.players.length;i++){
+	console.log(board.players[i].ID, " survived until round ", board.players[i].died);
+}
+console.log("END");
 </script>
 
 <style>
